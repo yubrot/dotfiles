@@ -1,0 +1,21 @@
+:set prompt ">> "
+:m +Data.Array
+:m +Data.Bits
+:m +Data.Char
+:m +Data.Either
+:m +Data.Function
+:m +Data.List
+:m +Data.Monoid
+:m +Data.Ord
+:m +Data.Ratio
+:m +Control.Monad
+:m +Control.Arrow
+:m +Control.Applicative
+:set -XNoMonomorphismRestriction
+:set -XFlexibleContexts
+:set -XFlexibleInstances
+:set -XBangPatterns
+:set -XTypeOperators
+:set -XTupleSections
+:set -XLambdaCase
+:set -XMultiWayIf

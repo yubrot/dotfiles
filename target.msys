@@ -1,0 +1,14 @@
+.zshrc
+.config/zsh
+.config/peco
+.vimperatorrc
+.minttyrc
+.vimrc
+.vim/bundle/neobundle.vim
+.gitconfig
+.ghci
+.local/bin/diff-highlight
+.gitignore.global
+AppData/Roaming/keyhac/config.py
+.tmux.conf
+.gemrc

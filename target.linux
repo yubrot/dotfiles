@@ -1,0 +1,13 @@
+.zshrc
+.Xmodmap
+.config/zsh
+.config/peco
+.vimperatorrc
+.vimrc
+.vim/bundle/neobundle.vim
+.gitconfig
+.ghci
+.local/bin/diff-highlight
+.gitignore.global
+.tmux.conf
+.gemrc

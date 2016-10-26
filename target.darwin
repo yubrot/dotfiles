@@ -1,0 +1,15 @@
+.zshrc
+.config/zsh
+.config/peco
+.vimperatorrc
+.vimrc
+.vim/bundle/neobundle.vim
+.gitconfig
+.ghci
+.local/bin/diff-highlight
+Library/Preferences/org.pqrs.Karabiner.plist
+Library/Preferences/org.pqrs.Seil.plist
+.gitignore.global
+.hammerspoon
+.tmux.conf
+.gemrc

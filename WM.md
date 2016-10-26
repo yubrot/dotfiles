@@ -1,0 +1,26 @@
+super + ctrl + r       設定の再読み込み
+
+super + return         端末の起動
+super + shift + c      ウィンドウを閉じる
+super + r              ランチャをフォーカス (keyhac)
+
+super + v              クリック
+
+super + [hjkl]         方向でウィンドウのフォーカス移動
+super + i              最も近いウィンドウにフォーカス移動
+super + o              別のスクリーンのウィンドウにフォーカス移動
+
+super + shift + [hl]   スクリーン端をスナップしたままになるように左右にリサイズ
+
+super + [sf]           ウィンドウをグリッド移動
+super + shift + i      ウィンドウを最も近いグリッドに移動
+super + shift + o      ウィンドウを別のスクリーンに移動
+
+super + m              最大化切り替え
+
+super + [1-9]          仮想デスクトップの切り替え
+super + shift + [1-9]  ウィンドウと共に仮想デスクトップの切り替え
+
+pageup                 volume up (Hammerspoon)
+pagedown               volume down (Hammerspoon)
+
