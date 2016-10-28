@@ -4,7 +4,6 @@
 .config/peco
 .vimperatorrc
 .vimrc
-.vim/bundle/neobundle.vim
 .gitconfig
 .ghci
 .local/bin/diff-highlight

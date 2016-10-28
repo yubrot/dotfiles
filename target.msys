@@ -4,7 +4,6 @@
 .vimperatorrc
 .minttyrc
 .vimrc
-.vim/bundle/neobundle.vim
 .gitconfig
 .ghci
 .local/bin/diff-highlight
