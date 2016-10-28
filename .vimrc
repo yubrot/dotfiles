@@ -1,99 +1,98 @@
-set nocompatible
-
-filetype plugin indent off
-set encoding=utf-8
-if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
+if &compatible
+  set nocompatible
 endif
 
 let s:is_darwin = stridx(system('uname'), "Darwin") != -1
 let s:is_msys = stridx(system('uname'), "NT") != -1
 
-call neobundle#begin(expand('~/.vim/bundle/'))
+let s:dein_dir = expand('~/.cache/dein')
+let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
 
-NeoBundleFetch 'Shougo/neobundle.vim'
-
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'Shougo/vimproc.vim', {
-\ 'build' : {
-\     'windows' : 'tools\\update-dll-mingw',
-\     'cygwin' : 'make -f make_cygwin.mak',
-\     'mac' : 'make',
-\     'linux' : 'make',
-\     'unix' : 'gmake',
-\    },
-\ }
-NeoBundle 'Shougo/vimfiler.vim'
-
-" tmp
-if !s:is_msys
-  NeoBundle 'Shougo/neocomplete.vim'
+if &runtimepath !~# '/dein.vim'
+  if !isdirectory(s:dein_repo_dir)
+    execute '!git clone https://github.com/Shougo/dein.vim' s:dein_repo_dir
+  endif
+  execute 'set runtimepath^=' . fnamemodify(s:dein_repo_dir, ':p')
 endif
 
-NeoBundle 'kien/ctrlp.vim'
-NeoBundle 'nathanaelkane/vim-indent-guides'
-NeoBundle 'LeafCage/foldCC'
-NeoBundle 'rking/ag.vim'
-NeoBundle 'yanktmp.vim'
-NeoBundle 'sudo.vim'
-NeoBundle 'tpope/vim-surround'
-NeoBundle 'thinca/vim-quickrun'
-NeoBundle 'thinca/vim-visualstar'
-NeoBundle 'glidenote/memolist.vim'
-NeoBundle 'sjl/gundo.vim'
-NeoBundle 'kana/vim-operator-replace'
-NeoBundle 'kana/vim-operator-user'
-NeoBundle 'LeafCage/yankround.vim'
-NeoBundle 'kana/vim-submode'
-NeoBundle 'bling/vim-airline'
-NeoBundle 'gitignore'
-NeoBundle 'tyru/caw.vim'
+if dein#load_state(s:dein_dir)
+  call dein#begin(s:dein_dir)
 
-NeoBundle 'w0ng/vim-hybrid'
+  call dein#add('Shougo/dein.vim')
 
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'gregsexton/gitv'
-NeoBundle 'jreybert/vimagit'
+  " temporary
+  call dein#add('Shougo/vimproc.vim', {'build' : 'make'})
+  call dein#add('Shougo/unite.vim')
+  call dein#add('Shougo/vimfiler.vim')
 
-NeoBundle 'eagletmt/ghcmod-vim'
-NeoBundle 'eagletmt/neco-ghc'
-NeoBundle 'mattn/emmet-vim'
-NeoBundle 'leafgarland/typescript-vim'
-NeoBundle 'rust-lang/rust.vim'
-NeoBundle 'cespare/vim-toml'
-NeoBundle 'elixir-lang/vim-elixir'
-NeoBundle 'lambdatoast/elm.vim'
-NeoBundle 'digitaltoad/vim-jade'
-"NeoBundle 'slimv.vim'
-NeoBundle 'rhysd/vim-llvm'
-NeoBundle 'rhysd/vim-crystal'
-NeoBundle 'udalov/kotlin-vim'
-NeoBundle 'derekwyatt/vim-scala'
-NeoBundle 'keith/swift.vim'
-if s:is_darwin
-  NeoBundleLazy 'OmniSharp/omnisharp-vim', {
-    \   'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] },
-    \   'build': {
-    \     'windows' : 'msbuild server/OmniSharp.sln',
-    \     'mac': 'xbuild server/OmniSharp.sln',
-    \     'unix': 'xbuild server/OmniSharp.sln',
-    \   },
-    \ }
+  if !s:is_msys
+    call dein#add('Shougo/neocomplete.vim')
+  endif
+
+  " core
+  call dein#add('w0ng/vim-hybrid')
+  call dein#add('ctrlpvim/ctrlp.vim')
+  call dein#add('nathanaelkane/vim-indent-guides')
+  call dein#add('LeafCage/foldCC')
+  call dein#add('rking/ag.vim')
+  call dein#add('yanktmp.vim')
+  call dein#add('sudo.vim')
+  call dein#add('tpope/vim-surround')
+  call dein#add('thinca/vim-quickrun')
+  call dein#add('thinca/vim-visualstar')
+  call dein#add('glidenote/memolist.vim')
+  call dein#add('sjl/gundo.vim')
+  call dein#add('kana/vim-operator-replace')
+  call dein#add('kana/vim-operator-user')
+  call dein#add('LeafCage/yankround.vim')
+  call dein#add('kana/vim-submode')
+  call dein#add('bling/vim-airline')
+  call dein#add('gitignore')
+  call dein#add('tyru/caw.vim')
+  call dein#add('tpope/vim-fugitive')
+  call dein#add('gregsexton/gitv')
+  call dein#add('jreybert/vimagit')
+
+  " language support
+  call dein#add('eagletmt/ghcmod-vim')
+  call dein#add('eagletmt/neco-ghc')
+  call dein#add('mattn/emmet-vim')
+  call dein#add('leafgarland/typescript-vim')
+  call dein#add('rust-lang/rust.vim')
+  call dein#add('cespare/vim-toml')
+  call dein#add('elixir-lang/vim-elixir')
+  call dein#add('lambdatoast/elm.vim')
+  call dein#add('digitaltoad/vim-jade')
+  " call dein#add('slimv.vim')
+  call dein#add('rhysd/vim-llvm')
+  call dein#add('rhysd/vim-crystal')
+  call dein#add('udalov/kotlin-vim')
+  call dein#add('derekwyatt/vim-scala')
+  call dein#add('keith/swift.vim')
+  if s:is_darwin
+    call dein#add('OmniSharp/omnisharp-vim', {
+    \ 'lazy': 1,
+    \ 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] },
+    \ 'build': {
+    \   'windows' : 'msbuild server/OmniSharp.sln',
+    \   'mac': 'xbuild server/OmniSharp.sln',
+    \   'unix': 'xbuild server/OmniSharp.sln',
+    \   }
+    \ })
+  endif
+
+  call dein#end()
+  call dein#save_state()
 endif
-NeoBundleLazy 'alpaca-tc/beautify.vim', {
-  \ 'autoload' : {
-  \   'commands' : [
-  \     {
-  \       'name' : 'Beautify',
-  \       'complete' : 'customlist,beautify#complete_options'
-  \     }
-  \ ]
-  \ }}
 
-call neobundle#end()
+if dein#check_install()
+  call dein#install()
+endif
 
 filetype plugin indent on
-NeoBundleCheck
+syntax enable
+
+set encoding=utf-8
 
 set number
 set noswapfile
@@ -172,6 +171,7 @@ endfunction
 command W :call ToUNI()
 command Xe :%!xxd
 command Xd :%!xxd -r
+command JSON :%!python -m json.tool
 
 nnoremap s <Nop>
 nnoremap Q <Nop>
