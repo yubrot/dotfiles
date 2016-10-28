@@ -45,7 +45,6 @@ if dein#load_state(s:dein_dir)
   call dein#add('kana/vim-operator-replace')
   call dein#add('kana/vim-operator-user')
   call dein#add('LeafCage/yankround.vim')
-  call dein#add('kana/vim-submode')
   call dein#add('bling/vim-airline')
   call dein#add('gitignore')
   call dein#add('tyru/caw.vim')
@@ -62,7 +61,6 @@ if dein#load_state(s:dein_dir)
   call dein#add('cespare/vim-toml')
   call dein#add('elixir-lang/vim-elixir')
   call dein#add('lambdatoast/elm.vim')
-  call dein#add('digitaltoad/vim-jade')
   " call dein#add('slimv.vim')
   call dein#add('rhysd/vim-llvm')
   call dein#add('rhysd/vim-crystal')
@@ -94,7 +92,13 @@ syntax enable
 
 set encoding=utf-8
 
+set background=dark
+colorscheme hybrid
+
 set number
+
+set hidden
+set nobackup
 set noswapfile
 set noundofile
 
@@ -108,14 +112,7 @@ set tags=tags;
 set t_Co=256
 syntax enable
 
-"let g:hybrid_use_iTerm_colors = 1
-set background=dark
-colorscheme hybrid
-
 set nowrap
-
-set hidden
-
 set backspace=indent,eol,start
 
 set expandtab
@@ -135,11 +132,12 @@ set ruler
 set laststatus=2
 set cmdheight=1
 
+set ambiwidth=double
+
 set t_vb=
 set novisualbell
 
 set notimeout
-set nobackup
 
 set scrolloff=6
 
@@ -166,7 +164,6 @@ command DOS :call ToDOS()
 function! ToUNI()
   set ff=unix
   set fenc=utf8
-  w
 endfunction
 command W :call ToUNI()
 command Xe :%!xxd
@@ -183,58 +180,21 @@ map <Space> [org]
 
 nnoremap [org]t :tabnew<CR>
 nnoremap [org]s :tab split<CR>
-nnoremap [org]d :q<CR>
+nnoremap [org]d :call ModifiedCheck()<CR>:q<CR>
 nnoremap [org]D :bd<CR>
 nnoremap H gT
 nnoremap L gt
+
+nnoremap [org]f :call ModifiedCheck()<CR>:VimFiler<CR>
+nnoremap [org]o :call ModifiedCheck()<CR>:CtrlP<CR>
+nnoremap [org]a :call ModifiedCheck()<CR>:Ag 
+nnoremap [org]w :w<CR>
 
 function! ModifiedCheck()
   if &mod == 1
     tab split
   endif
 endfunction
-
-nnoremap [org]f :call ModifiedCheck()<CR>:VimFiler<CR>
-nnoremap [org]o :call ModifiedCheck()<CR>:CtrlP<CR>
-nnoremap [org]a :call ModifiedCheck()<CR>:Ag 
-
-"nnoremap [org]b :CtrlPBuffer<CR>
-"nnoremap H :bp<CR>
-"nnoremap L :bn<CR>
-
-"nnoremap [org]w :setl wrap!<CR>
-nnoremap [org]w :w<CR>
-
-nnoremap ss :<C-u>sp<CR>
-nnoremap sv :<C-u>vs<CR>
-
-nnoremap sh <C-w>h
-nnoremap sj <C-w>j
-nnoremap sk <C-w>k
-nnoremap sl <C-w>l
-nnoremap [org]n <C-w><C-w>
-
-nnoremap sH <C-w>H
-nnoremap sJ <C-w>J
-nnoremap sK <C-w>K
-nnoremap sL <C-w>L
-
-nnoremap so <C-w>_<C-w>|
-nnoremap sO <C-w>=
-call submode#enter_with('bufmove', 'n', '', 's>', '<C-w>>')
-call submode#enter_with('bufmove', 'n', '', 's<', '<C-w><')
-call submode#enter_with('bufmove', 'n', '', 's+', '<C-w>+')
-call submode#enter_with('bufmove', 'n', '', 's-', '<C-w>-')
-call submode#map('bufmove', 'n', '', '>', '<C-w>>')
-call submode#map('bufmove', 'n', '', '<', '<C-w><')
-call submode#map('bufmove', 'n', '', '+', '<C-w>+')
-call submode#map('bufmove', 'n', '', '-', '<C-w>-')
-
-vnoremap sf zf
-nnoremap so zo
-nnoremap sc zc
-nnoremap sO zO
-nnoremap sC zC
 
 nnoremap [org]mo :exe "CtrlP" g:memolist_path<CR><F5>
 nnoremap [org]mn :MemoNew<CR>
@@ -274,11 +234,6 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 nnoremap [org]gs :Gstatus<CR>
 nnoremap [org]gl :Gitv<CR>
 nnoremap [org]gf :Gitv!<CR>
-
-if s:is_darwin
-  set ambiwidth=double
-  let g:previm_open_cmd = 'open -a Firefox'
-endif
 
 if s:is_darwin
   vnoremap <silent> [org]y :w !pbcopy<CR><CR>
@@ -328,17 +283,9 @@ let g:necoghc_enable_detailed_browse=1
 nnoremap \c :make %<CR>
 let b:quickrun_config = {'outputter/buffer/split': "", 'outputter/buffer/into': 1}
 let g:quickrun_config = {}
-let g:quickrun_config['jade'] = {'command': 'jade', 'cmdopt': '-P', 'exec': ['%c &o < %s']}
-let g:quickrun_config['haxe'] = {'command': 'haxe', 'args': '-x', 'cmdopt': '-main '."%{HaxeClssName(expand(\"%S:t:r\"))}", 'exec' : "%c %o %a %s:p"}
 let g:quickrun_config['swift'] = {'command': 'swift', 'exec': '%c %o %s'}
 let g:quickrun_config['haskell'] = {'command': 'stack', 'cmdopt': 'runghc --', 'exec': '%c %o %s'}
 
-function! HaxeClssName(word)
-  return substitute(a:word, '^\v.*\ze\.hx', '\u&', '')
-endfunction
-
-"autocmd BufWritePost *.coffee silent make!
-"autocmd BufWritePost *.ts make
 autocmd QuickFixCmdPost [^l]* nested cwindow
 
 let g:ctrlp_custom_ignore = {
@@ -428,9 +375,5 @@ if !s:is_msys
 
   let g:haskellmode_completion_ghc = 0
   autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
-endif
-
-if has('conceal')
-  set conceallevel=2 concealcursor=i
 endif
 
