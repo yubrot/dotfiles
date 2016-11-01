@@ -182,6 +182,7 @@ nnoremap [org]t :tabnew<CR>
 nnoremap [org]s :tab split<CR>
 nnoremap [org]d :call ModifiedCheck()<CR>:q<CR>
 nnoremap [org]D :bd<CR>
+nnoremap [org]n <C-w>w
 nnoremap H gT
 nnoremap L gt
 
