@@ -6,10 +6,10 @@ zstyle :compinstall filename '~/.zshrc'
 
 case "${OSTYPE}" in
 darwin*)
-  # mv Vim vim
-  export EDITOR=/Applications/MacVim.app/Contents/MacOS/vim
+  export EDITOR=/Applications/MacVim.app/Contents/MacOS/Vim
   PATH=/usr/local/opt/llvm/bin:$PATH
   PATH=/Applications/MacVim.app/Contents/MacOS:$PATH
+  alias vim='Vim'
   alias ls='ls -F -G' # -X
   alias cp='cp -apR'
   alias scp='scp -r'
