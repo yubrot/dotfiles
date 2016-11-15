@@ -320,6 +320,13 @@ autocmd FileType java setlocal shiftwidth=4 softtabstop=4
 autocmd FileType groovy setlocal shiftwidth=4 softtabstop=4
 autocmd FileType kotlin setlocal shiftwidth=4 softtabstop=4
 
+if executable('opam')
+  let g:syntastic_ocaml_checkers=['merlin']
+  let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
+  autocmd FileType ocaml execute "set rtp+=" . g:opamshare . "/merlin/vim"
+  autocmd FileType ocaml execute "set rtp^=" . g:opamshare . "/ocp-indent/vim"
+endif
+
 let g:ag_apply_qmappings=0
 let g:ag_apply_lmappings=0
 
@@ -339,7 +346,7 @@ if !s:is_msys
       \ 'default' : '',
       \ 'vimshell' : $HOME.'/.vimshell_hist',
       \ 'scheme' : $HOME.'/.gosh_completions'
-          \ }
+      \ }
 
   if !exists('g:neocomplete#keyword_patterns')
       let g:neocomplete#keyword_patterns = {}
@@ -369,6 +376,12 @@ if !s:is_msys
   endif
 
   let g:neocomplete#sources#omni#input_patterns.cs = '.*[^=\);]'
+
+  if !exists('g:neocomplete#force_omni_input_patterns')
+    let g:neocomplete#force_omni_input_patterns = {}
+  endif
+
+  let g:neocomplete#force_omni_input_patterns.ocaml = '[^. *\t]\.\w*\|\h\w*|#'
 
   if s:is_darwin
     autocmd FileType cs setlocal omnifunc=OmniSharp#Complete

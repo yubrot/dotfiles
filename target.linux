@@ -10,3 +10,4 @@
 .gitignore.global
 .tmux.conf
 .gemrc
+.ocamlinit

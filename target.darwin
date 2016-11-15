@@ -12,3 +12,4 @@ Library/Preferences/org.pqrs.Seil.plist
 .hammerspoon
 .tmux.conf
 .gemrc
+.ocamlinit
