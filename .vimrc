@@ -110,7 +110,6 @@ set incsearch
 set tags=tags;
 
 set t_Co=256
-syntax enable
 
 set nowrap
 set backspace=indent,eol,start
@@ -321,10 +320,9 @@ autocmd FileType groovy setlocal shiftwidth=4 softtabstop=4
 autocmd FileType kotlin setlocal shiftwidth=4 softtabstop=4
 
 if executable('opam')
-  let g:syntastic_ocaml_checkers=['merlin']
   let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
-  autocmd FileType ocaml execute "set rtp+=" . g:opamshare . "/merlin/vim"
-  autocmd FileType ocaml execute "set rtp^=" . g:opamshare . "/ocp-indent/vim"
+  execute "set rtp+=" . g:opamshare . "/merlin/vim"
+  execute "set rtp^=" . g:opamshare . "/ocp-indent/vim"
 endif
 
 let g:ag_apply_qmappings=0
