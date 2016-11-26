@@ -84,15 +84,11 @@ alias lss='ls -lh'
 alias s='ls'
 alias v='vim'
 alias g='git'
-alias d='docker'
-alias dl='d ps -lq'
 alias dex='d exec -it'
 alias ghc='stack ghc --'
 alias ghci='stack ghci --'
 alias runghc='stack runghc --'
 alias st='stack install --test --file-watch'
-dclean() { d ps -a | grep 'weeks ago' | awk '{print $1}' | xargs --no-run-if-empty docker rm }
-alias dc='docker-compose'
 alias mkdir='mkdir -p'
 alias zip='zip -r'
 alias -g H=' | head'
@@ -101,10 +97,20 @@ alias -g G=' | grep'
 alias -g L=' | less'
 alias -g P=' | peco'
 alias -g X=' | xargs'
-alias tmongo='mongod --nojournal --noprealloc --dbpath ~/.mongo &'
 alias objc='clang -fobjc-arc -fobjc-exceptions -fobjc-arc-exceptions -w -framework Foundation'
 alias testserver='python -m http.server'
 fignore=(.o .obj .bak .hi .deps .meta .asset .mdb .sln .unity)
+
+alias d='docker'
+alias dc='docker-compose'
+alias dr='d run --rm -it'
+alias dcr='dc run --rm'
+alias dl='d ps -lq'
+dclean() {
+  d rm `d ps -aq`
+  d volume rm `d volume ls -f dangling=true -q`
+  d rmi `d images -f dangling=true -q`
+}
 
 hash -d box=~/Dropbox
 
@@ -138,7 +144,7 @@ precmd() {
   print -Pn "\e]0;%n@%m %~\a %(!.#.$)"
 }
 
-extract () {
+extract() {
   if [ -f $1 ] ; then
       case $1 in
           *.tar.bz2)   tar xvjf $1    ;;
@@ -162,9 +168,6 @@ extract () {
   fi
 }
 alias ex='extract'
-
-export _Z_CMD=j
-source ~/.config/zsh/z.sh
 
 source ~/.config/zsh/auto-fu.zsh
 source ~/.config/zsh/auto-fu-ext.zsh
