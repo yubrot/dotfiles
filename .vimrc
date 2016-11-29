@@ -44,6 +44,7 @@ if dein#load_state(s:dein_dir)
   call dein#add('sjl/gundo.vim')
   call dein#add('kana/vim-operator-replace')
   call dein#add('kana/vim-operator-user')
+  call dein#add('kana/vim-smartchr')
   call dein#add('LeafCage/yankround.vim')
   call dein#add('bling/vim-airline')
   call dein#add('gitignore')
@@ -388,4 +389,6 @@ if !s:is_msys
   let g:haskellmode_completion_ghc = 0
   autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
 endif
+
+autocmd FileType javascript,typescript inoremap <buffer><expr> @ smartchr#one_of('this.', '@')
 
