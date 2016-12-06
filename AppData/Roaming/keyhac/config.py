@@ -18,7 +18,7 @@ def configure(keymap):
 
     spaces = Spaces(9)
     bind = keymap.defineWindowKeymap()
-    recorder = Recorder(JobQueue.defaultQueue())
+    recorder = Recorder(JobQueue.defaultQueue(), 'D:\\record\\')
 
     bind["BACKSLASH"] = keymap.InputKeyCommand("S-UNDERSCORE")
 
@@ -311,10 +311,10 @@ class StandardWin(Box):
 
 class Recorder:
     # (context: JobQueue) -> Recorder
-    def __init__(self, context):
+    def __init__(self, context, baseDir):
         self.cron = CronTable()
         self.context = context
-        self.baseDir = os.path.expanduser('~\\record\\')
+        self.baseDir = baseDir
         self.recordTargets = []
         self.observer = None
 
