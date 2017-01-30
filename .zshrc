@@ -27,7 +27,7 @@ linux*)
   ;;
 msys*)
   export EDITOR=/usr/bin/vim
-  alias ls='ls -XF --color=auto -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Contacts -I Favorites -I "Local Settings" -I OneDrive -I PrintHood -I "Saved Games" -I Cookies -I Links -I NetHood -I Recent -I Searches -I SendTo -I Templates -I Tracing -I "My Documents" -I Videos -I vimperator -I "VirtualBox VMs" -I "スタート メニュー"'
+  alias ls='ls -XF --color=auto -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Contacts -I Favorites -I "Local Settings" -I OneDrive -I PrintHood -I "Saved Games" -I Cookies -I Links -I NetHood -I Recent -I Searches -I SendTo -I Templates -I Tracing -I "My Documents" -I Videos -I "スタート メニュー" -I "\$Recycle.Bin"'
   alias cp='cp -apr'
   alias scp='scp -r'
   export TMUX_TMPDIR=~/.tmux.tmp

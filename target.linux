@@ -2,7 +2,7 @@
 .Xmodmap
 .config/zsh
 .config/peco
-.vimperatorrc
+.config/vimfx
 .vimrc
 .gitconfig
 .ghci

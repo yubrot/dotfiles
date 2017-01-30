@@ -1,7 +1,7 @@
 .zshrc
 .config/zsh
 .config/peco
-.vimperatorrc
+.config/vimfx
 .minttyrc
 .vimrc
 .gitconfig
