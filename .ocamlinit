@@ -5,6 +5,6 @@ let () =
 
 #use "topfind";;
 #thread;;
-#require "ppx_jane,core";;
 
-open Core.Std;;
+(* #require "ppx_jane,core";; *)
+(* open Core.Std;; *)

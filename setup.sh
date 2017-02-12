@@ -16,14 +16,12 @@ case $1 in
       mkdir -p "`dirname "$HOME/$i"`"
       rm -f "$HOME/$i"
       ln -s "$cwd/$i" "$HOME/$i"
-    done
-    echo 'done.';;
+    done;;
 
   "unlink")
     cat $dotfiles | while read i; do
       rm -f "$HOME/$i"
-    done
-    echo 'done.';;
+    done;;
 
   *)
     echo 'usage: ./setup.sh (link|unlink)';;
