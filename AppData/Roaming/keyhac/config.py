@@ -54,6 +54,8 @@ def configure(keymap):
 
     bind["U0-Q"] = focusedWin(lambda win: recorder.toggle(win))
 
+    bind["U0-S-I"] = dump
+
     switchCommand = lambda index: lambda: spaces.switchTo(index)
     switchWithWinCommand = lambda index: focusedWin(lambda win: spaces.switchTo(index, win))
 
@@ -301,6 +303,8 @@ class StandardWin(Box):
         if win.isMinimized(): return False
         # ignore explorer.exe
         if win.getClassName() == "Progman": return False
+        # ignore NVIDIA GeForce Overlay
+        if win.getClassName() == "CEF-OSR-WIDGET": return False
         # ignore ApplicationFrameWindow
         if win.getClassName() == "ApplicationFrameWindow": return False
         # ignore CoreWindow
@@ -410,4 +414,8 @@ def focusedWin(f, orFocus = False):
                 w.focus()
                 return
     return ret
+
+def dump():
+    for w in StandardWin.allWindows():
+        print(w.win.getText(), ": ", w.win.getClassName())
 
