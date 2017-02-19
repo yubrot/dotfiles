@@ -319,6 +319,7 @@ autocmd FileType objc setlocal shiftwidth=4 softtabstop=4
 autocmd FileType java setlocal shiftwidth=4 softtabstop=4
 autocmd FileType groovy setlocal shiftwidth=4 softtabstop=4
 autocmd FileType kotlin setlocal shiftwidth=4 softtabstop=4
+autocmd FileType go setlocal noexpandtab shiftwidth=4 listchars=tab:\ \ ,trail:_
 
 if executable('opam')
   let g:opamshare = substitute(system('opam config var share'),'\n$','','''')

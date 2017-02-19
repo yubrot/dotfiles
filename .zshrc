@@ -37,11 +37,14 @@ msys*)
   ;;
 esac
 
+export GOPATH=$HOME/in/go
+
 PATH=$HOME/.local/bin:$PATH
 PATH=$HOME/.cargo/bin:$PATH
 PATH=$HOME/.gem/bin:$PATH
 PATH=$HOME/.nodebrew/current/bin:$PATH
 PATH=$HOME/.yarn/bin:$PATH
+PATH=$GOPATH/bin:$PATH
 export PATH
 
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
