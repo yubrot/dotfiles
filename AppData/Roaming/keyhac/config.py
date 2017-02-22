@@ -54,7 +54,7 @@ def configure(keymap):
 
     bind["U0-Q"] = focusedWin(lambda win: recorder.toggle(win))
 
-    bind["U0-S-I"] = dump
+    bind["U0-S-D"] = dump
 
     switchCommand = lambda index: lambda: spaces.switchTo(index)
     switchWithWinCommand = lambda index: focusedWin(lambda win: spaces.switchTo(index, win))
