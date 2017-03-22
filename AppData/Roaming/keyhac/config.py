@@ -304,7 +304,7 @@ class StandardWin(Box):
         # ignore explorer.exe
         if win.getClassName() == "Progman": return False
         # ignore NVIDIA GeForce Overlay
-        if win.getClassName() == "CEF-OSR-WIDGET": return False
+        if win.getClassName() == "CEF-OSC-WIDGET": return False
         # ignore ApplicationFrameWindow
         if win.getClassName() == "ApplicationFrameWindow": return False
         # ignore CoreWindow
