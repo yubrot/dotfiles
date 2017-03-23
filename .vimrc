@@ -313,13 +313,9 @@ let g:indent_guides_auto_colors=0
 hi IndentGuidesOdd ctermbg=235
 
 set shiftwidth=2 softtabstop=2
-autocmd FileType cs setlocal shiftwidth=4 softtabstop=4
 autocmd FileType swift setlocal shiftwidth=2 softtabstop=2
-autocmd FileType objc setlocal shiftwidth=4 softtabstop=4
-autocmd FileType java setlocal shiftwidth=4 softtabstop=4
-autocmd FileType groovy setlocal shiftwidth=4 softtabstop=4
-autocmd FileType kotlin setlocal shiftwidth=4 softtabstop=4
-autocmd FileType go setlocal noexpandtab shiftwidth=4 listchars=tab:\ \ ,trail:_
+autocmd FileType cs,java,objc,groovy,kotlin setlocal shiftwidth=4 softtabstop=4
+autocmd FileType go,make setlocal noexpandtab shiftwidth=4 listchars=tab:\ \ ,trail:_
 
 if executable('opam')
   let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
