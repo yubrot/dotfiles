@@ -7,13 +7,12 @@ zstyle :compinstall filename '~/.zshrc'
 case "${OSTYPE}" in
 darwin*)
   export EDITOR=/Applications/MacVim.app/Contents/MacOS/Vim
-  PATH=/usr/local/opt/llvm/bin:$PATH
-  PATH=/Applications/MacVim.app/Contents/MacOS:$PATH
   alias vim='Vim'
   alias ls='ls -F -G' # -X
   alias cp='cp -apR'
   alias scp='scp -r'
   hash -d dl=~/Downloads
+  PATH=/Applications/MacVim.app/Contents/MacOS:$PATH
   ;;
 linux*)
   export EDITOR=/usr/bin/vim
@@ -38,13 +37,16 @@ msys*)
 esac
 
 export GOPATH=$HOME/in/go
+export RBENV_SHELL=zsh
 
 PATH=$HOME/.local/bin:$PATH
+
 PATH=$HOME/.cargo/bin:$PATH
 PATH=$HOME/.gem/bin:$PATH
+PATH=$HOME/.rbenv/shims:$PATH
 PATH=$HOME/.nodebrew/current/bin:$PATH
-PATH=$HOME/.yarn/bin:$PATH
 PATH=$GOPATH/bin:$PATH
+
 export PATH
 
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
