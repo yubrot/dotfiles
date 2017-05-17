@@ -61,13 +61,11 @@ if dein#load_state(s:dein_dir)
   call dein#add('rust-lang/rust.vim')
   call dein#add('cespare/vim-toml')
   call dein#add('elixir-lang/vim-elixir')
-  call dein#add('lambdatoast/elm.vim')
   " call dein#add('slimv.vim')
   call dein#add('rhysd/vim-llvm')
-  call dein#add('rhysd/vim-crystal')
-  call dein#add('udalov/kotlin-vim')
   call dein#add('derekwyatt/vim-scala')
   call dein#add('keith/swift.vim')
+  call dein#add('reasonml/vim-reason-loader')
   if s:is_darwin
     call dein#add('OmniSharp/omnisharp-vim', {
     \ 'lazy': 1,
