@@ -2,12 +2,11 @@
 .config/zsh
 .config/peco
 .config/vimfx
+.config/karabiner
 .vimrc
 .gitconfig
 .ghci
 .local/bin/diff-highlight
-Library/Preferences/org.pqrs.Karabiner.plist
-Library/Preferences/org.pqrs.Seil.plist
 .gitignore.global
 .hammerspoon
 .tmux.conf
