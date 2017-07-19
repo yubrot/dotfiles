@@ -43,7 +43,8 @@ function init()
 
   for i = 1, 9 do
     local key = tostring(i)
-    -- hs.hotkey.bind({"alt"}, key, hs.fnutils.applyR(hs.window.switchToSpace, key))
+    -- NOTE
+    -- Option(Alt) + [1-9] で対応するスペースに移動するようにシステムの環境設定を行うことで動作する
     hs.hotkey.bind({"alt", "shift"}, key, focusedWin(hs.fnutils.applyR(hs.window.moveToSpace, key)))
   end
 
@@ -236,21 +237,6 @@ end
 -- https://github.com/nathyong/mjolnir.ny.tiling
 -- mousedownを発行、スペース移動、mouseupを発行としてウィンドウと一緒にspace移動する
 do
-  local e = hs.eventtap.event
-  hs.window.spacesModifiers = {ctrl = true}
-
-  local function newKeyEventVerbose(mods, key, isPressed)
-    local ev = e.newKeyEvent({}, '', isPressed)
-    ev:setKeyCode(hs.keycodes.map[key])
-    ev:setFlags(mods)
-    return ev
-  end
-
-  function hs.window.switchToSpace(key)
-    newKeyEventVerbose(hs.window.spacesModifiers, key, true):post()
-    newKeyEventVerbose(hs.window.spacesModifiers, key, false):post()
-  end
-
   function hs.window:moveToSpace(key)
     local bak = hs.mouse.getAbsolutePosition()
     local pos = self:zoomButtonRect()
@@ -259,10 +245,11 @@ do
     pos.y = pos.y + (pos.h / 2)
 
     hs.mouse.setAbsolutePosition(pos)
-    e.newMouseEvent(e.types.leftMouseDown, pos):post()
-    hs.window.switchToSpace(key)
+    hs.eventtap.event.newMouseEvent(hs.eventtap.event.types.leftMouseDown, pos):post()
+    hs.eventtap.event.newKeyEvent({"alt"}, key, true):post()
+    hs.eventtap.event.newKeyEvent({"alt"}, key, false):post()
     hs.timer.usleep(300000)
-    e.newMouseEvent(e.types.leftMouseUp, pos):post()
+    hs.eventtap.event.newMouseEvent(hs.eventtap.event.types.leftMouseUp, pos):post()
     hs.mouse.setAbsolutePosition(bak)
   end
 end
@@ -280,8 +267,5 @@ function focusedWin(f, orFocus)
 end
 
 init()
-do
-  local _ = hs.application -- Hammerspoon #799
-end
 hs.alert.show("init.lua loaded")
 
