@@ -9,11 +9,15 @@ function init()
 
   hs.hotkey.bind({"alt", "ctrl"}, "r", hs.reload)
 
+  local touchTimer = nil
   hs.hotkey.bind({"alt"}, "v", function()
-    for i = 1, 20 do
-      hs.timer.doAfter(i * 0.05, function()
+    if touchTimer then
+      touchTimer:stop()
+      touchTimer = nil
+    else
+      touchTimer = hs.timer.doEvery(0.005, function()
         local p = hs.mouse.getAbsolutePosition()
-        hs.eventtap.leftClick(p)
+        hs.eventtap.leftClick(p, 10)
       end)
     end
   end)
