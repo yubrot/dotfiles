@@ -28,7 +28,7 @@ def configure(keymap):
 
     bind["U0-C-R"] = reload
 
-    bind["U0-V"] = keymap.MouseButtonClickCommand()
+    # bind["U0-V"] = keymap.MouseButtonClickCommand()
 
     bind["U0-Return"] = keymap.ShellExecuteCommand(None, "C:/msys64/msys2_shell.cmd", "-msys", "C:/msys64/")
     bind["U0-S-C"] = focusedWin(lambda win: win.close())
