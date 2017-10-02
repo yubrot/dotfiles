@@ -311,8 +311,7 @@ let g:indent_guides_auto_colors=0
 hi IndentGuidesOdd ctermbg=235
 
 set shiftwidth=2 softtabstop=2
-autocmd FileType swift setlocal shiftwidth=2 softtabstop=2
-autocmd FileType cs,java,objc,groovy,kotlin setlocal shiftwidth=4 softtabstop=4
+autocmd FileType cs,java,objc,groovy,kotlin,swift setlocal shiftwidth=4 softtabstop=4
 autocmd FileType go,make setlocal noexpandtab shiftwidth=4 listchars=tab:\ \ ,trail:_
 
 autocmd FileType lisp setlocal lispwords+=let1,def,defrecord,fun,for,let/cc,shift

@@ -45,6 +45,7 @@ PATH=$HOME/.cargo/bin:$PATH
 PATH=$HOME/.gem/bin:$PATH
 PATH=$HOME/.rbenv/shims:$PATH
 PATH=$HOME/.nodebrew/current/bin:$PATH
+PATH=$HOME/.anaconda3/anaconda/bin:$PATH
 PATH=$GOPATH/bin:$PATH
 
 export PATH
