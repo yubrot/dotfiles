@@ -8,7 +8,6 @@ case "${OSTYPE}" in
 darwin*)
   export EDITOR=/Applications/MacVim.app/Contents/MacOS/Vim
   alias vim='Vim'
-  alias ls='ls -F -G' # -X
   alias cp='cp -apR'
   alias scp='scp -r'
   hash -d dl=~/Downloads
@@ -16,7 +15,6 @@ darwin*)
   ;;
 linux*)
   export EDITOR=/usr/bin/vim
-  alias ls='ls -XF --color=auto'
   alias cp='cp -apr'
   alias scp='scp -r'
   alias open='xdg-open'
@@ -26,13 +24,27 @@ linux*)
   ;;
 msys*)
   export EDITOR=/usr/bin/vim
-  alias ls='ls -XF --color=auto -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Contacts -I Favorites -I "Local Settings" -I OneDrive -I PrintHood -I "Saved Games" -I Cookies -I Links -I NetHood -I Recent -I Searches -I SendTo -I Templates -I Tracing -I "My Documents" -I Videos -I "スタート メニュー" -I "\$Recycle.Bin"'
   alias cp='cp -apr'
   alias scp='scp -r'
   export TMUX_TMPDIR=~/.tmux.tmp
   mkdir -p ~/.tmux.tmp
   hash -d dl=~/Downloads
   PATH=$HOME/AppData/Roaming/local/bin:$PATH
+  ;;
+esac
+
+case "${OSTYPE}" in
+msys*)
+  alias ls='ls -XF --color=auto -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Contacts -I Favorites -I "Local Settings" -I OneDrive -I PrintHood -I "Saved Games" -I Cookies -I Links -I NetHood -I Recent -I Searches -I SendTo -I Templates -I Tracing -I "My Documents" -I Videos -I "スタート メニュー" -I "\$Recycle.Bin"'
+  alias la='ls -A'
+  alias lss='ls -lh'
+  alias s='ls'
+  ;;
+*)
+  alias ls='exa -F'
+  alias la='ls -a'
+  alias lss='ls -lh'
+  alias s='ls --git-ignore'
   ;;
 esac
 
@@ -85,9 +97,6 @@ PROMPT='%{${fg[green]}%}[%n@%m %~]%{${reset_color}%}
 %(!.#.$) '
 
 umask 022
-alias la='ls -A'
-alias lss='ls -lh'
-alias s='ls'
 alias v='vim'
 alias g='git'
 alias dex='d exec -it'
@@ -126,7 +135,7 @@ alias zmv='noglob zmv -w'
 alias c='cd ..'
 
 chpwd() {
-  ls
+  s
 }
 
 cdroot() {
