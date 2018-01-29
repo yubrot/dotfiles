@@ -38,13 +38,13 @@ msys*)
   alias ls='ls -XF --color=auto -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Contacts -I Favorites -I "Local Settings" -I OneDrive -I PrintHood -I "Saved Games" -I Cookies -I Links -I NetHood -I Recent -I Searches -I SendTo -I Templates -I Tracing -I "My Documents" -I Videos -I "スタート メニュー" -I "\$Recycle.Bin"'
   alias la='ls -A'
   alias lss='ls -lh'
-  alias s='ls'
+  alias s='ls -I "*.meta"'
   ;;
 *)
   alias ls='exa -F'
   alias la='ls -a'
   alias lss='ls -lh'
-  alias s='ls --git-ignore'
+  alias s='ls --git-ignore -I "*.meta"'
   ;;
 esac
 

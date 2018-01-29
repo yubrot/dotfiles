@@ -47,9 +47,9 @@ if dein#load_state(s:dein_dir)
   call dein#add('kana/vim-smartchr')
   call dein#add('LeafCage/yankround.vim')
   call dein#add('bling/vim-airline')
-  call dein#add('vim-scripts/gitignore')
   call dein#add('tyru/caw.vim')
   call dein#add('tpope/vim-fugitive')
+  call dein#add('octref/RootIgnore')
   call dein#add('gregsexton/gitv')
   call dein#add('jreybert/vimagit')
 
@@ -228,7 +228,8 @@ nnoremap th <C-w><C-z>
 
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
-let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline#extensions#tabline#show_tab_type = 0
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 
 nnoremap [org]gs :Gstatus<CR>
 nnoremap [org]gl :Gitv<CR>
