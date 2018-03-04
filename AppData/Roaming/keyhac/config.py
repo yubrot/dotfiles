@@ -30,7 +30,7 @@ def configure(keymap):
 
     # bind["U0-V"] = keymap.MouseButtonClickCommand()
 
-    bind["U0-Return"] = keymap.ShellExecuteCommand(None, "C:/msys64/msys2_shell.cmd", "-msys", "C:/msys64/")
+    bind["U0-Return"] = keymap.ShellExecuteCommand(None, "C:/msys64/msys2_shell.cmd", "-mingw64", "C:/msys64/")
     bind["U0-S-C"] = focusedWin(lambda win: win.close())
     bind["U0-R"] = keymap.ActivateWindowCommand("clnch.exe")
 

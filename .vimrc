@@ -229,7 +229,7 @@ nnoremap th <C-w><C-z>
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#show_tab_type = 0
-let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline#extensions#tabline#formatter = 'unique_tail'
 
 nnoremap [org]gs :Gstatus<CR>
 nnoremap [org]gl :Gitv<CR>
@@ -296,16 +296,10 @@ let g:ctrlp_switch_buffer = 'Et'
 let g:ctrlp_map = '<Nop>'
 
 let g:ctrlp_use_caching = 0
-if executable('ag')
-    set grepprg=ag\ --nogroup\ --nocolor
-
-    let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-else
-  let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f']
-  let g:ctrlp_prompt_mappings = {
-    \ 'AcceptSelection("e")': ['<space>', '<cr>', '<2-LeftMouse>'],
-    \ }
-endif
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f']
+let g:ctrlp_prompt_mappings = {
+  \ 'AcceptSelection("e")': ['<space>', '<cr>', '<2-LeftMouse>'],
+  \ }
 
 let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_auto_colors=0

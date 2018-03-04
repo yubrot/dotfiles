@@ -194,7 +194,7 @@ zstyle ':auto-fu:highlight' input bold
 zstyle ':auto-fu:var' postdisplay $''
 zstyle ':auto-fu:var' disable magic-space
 zstyle ':auto-fu:var' autoable-function/skiplbuffers \
-  'yaourt *' 'pacman *' 'sudo pacman *' 'adb * *' 'g * *' \
+  'yaourt *' 'pacman *' 'sudo pacman *' 'adb * *' 'g *' \
   'stack * *' 'st *' 'j *' 'd * *' 'dc * *' 'npm *' 'java *' \
   'journalctl *' 'scp *' 'rsync *' 'rustc *' './gradlew *' \
   './bin/rails *' './bin/rake *' 'brew *'
