@@ -7,6 +7,7 @@
   autocrlf = false
   excludesfile = ~/.gitignore.global
   fscache = true
+  ignorecase = false
 [merge]
   tool = vimdiff
   ff = false
@@ -31,7 +32,7 @@
   fix = commit --amend
   co = checkout
   ps = push -u
-  pl = pull
+  pl = pull --prune
   rbs = rebase -i
   pls = "!git stash; git pull; git stash pop"
   ag = grep --line-number --show-function --color --heading --break
