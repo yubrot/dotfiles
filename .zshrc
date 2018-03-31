@@ -1,81 +1,129 @@
 HISTFILE=~/.histfile
 HISTSIZE=1000000
 SAVEHIST=1000000
+
 bindkey -e
 zstyle :compinstall filename '~/.zshrc'
 
+use_exa_as_ls() {
+  alias ls='exa -F'
+  alias la='ls -a'
+  alias s='ls --git-ignore -I "*.meta"'
+}
+
 case "${OSTYPE}" in
 darwin*)
+  export PATH=/Applications/MacVim.app/Contents/MacOS:$PATH
   export EDITOR=/Applications/MacVim.app/Contents/MacOS/Vim
   alias vim='Vim'
+
   alias cp='cp -apR'
   alias scp='scp -r'
-  hash -d dl=~/Downloads
-  PATH=/Applications/MacVim.app/Contents/MacOS:$PATH
+
+  use_exa_as_ls
   ;;
 linux*)
   export EDITOR=/usr/bin/vim
+
   alias cp='cp -apr'
   alias scp='scp -r'
-  alias open='xdg-open'
-  alias pbcopy='xsel --display :0 -ib'
-  alias pbpaste='xsel --display :0 -ob'
-  hash -d dl=~/Desktop
+
+  use_exa_as_ls
   ;;
 msys*)
+  export PATH=$HOME/AppData/Roaming/local/bin:$PATH
   export EDITOR=/usr/bin/vim
+
   alias cp='cp -apr'
   alias scp='scp -r'
+
+  alias ls='ls -XF --color=auto'
+  alias la='ls -A'
+  alias s='ls -I "*.meta" -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Contacts -I "3D Objects" -I Favorites -I "Local Settings" -I OneDrive -I PrintHood -I "Saved Games" -I Cookies -I Links -I NetHood -I Recent -I Searches -I SendTo -I Templates -I Tracing -I "My Documents" -I Videos -I "スタート メニュー" -I "\$Recycle.Bin"'
+
   export TMUX_TMPDIR=~/.tmux.tmp
   mkdir -p ~/.tmux.tmp
-  hash -d dl=~/Downloads
-  PATH=$HOME/AppData/Roaming/local/bin:$PATH
   ;;
 esac
 
-case "${OSTYPE}" in
-msys*)
-  alias ls='ls -XF --color=auto -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Contacts -I Favorites -I "Local Settings" -I OneDrive -I PrintHood -I "Saved Games" -I Cookies -I Links -I NetHood -I Recent -I Searches -I SendTo -I Templates -I Tracing -I "My Documents" -I Videos -I "スタート メニュー" -I "\$Recycle.Bin"'
-  alias la='ls -A'
-  alias lss='ls -lh'
-  alias s='ls -I "*.meta"'
-  ;;
-*)
-  alias ls='exa -F'
-  alias la='ls -a'
-  alias lss='ls -lh'
-  alias s='ls --git-ignore -I "*.meta"'
-  ;;
-esac
+alias c='cd ..'
+alias v='vim'
+alias g='git'
+alias lss='ls -lh'
+alias mkdir='mkdir -p'
+alias zip='zip -r'
+alias testserver='python -m http.server'
+alias -g H=' | head'
+alias -g T=' | tail'
+alias -g G=' | grep'
+alias -g L=' | less'
 
-export GOPATH=$HOME/in/go
-export RBENV_SHELL=zsh
+chpwd() {
+  s
+}
 
-PATH=$HOME/.local/bin:$PATH
+cdroot() {
+  cd `git rev-parse --show-toplevel`
+}
 
-PATH=$HOME/.cargo/bin:$PATH
-PATH=$HOME/.gem/bin:$PATH
-PATH=$HOME/.rbenv/shims:$PATH
-PATH=$HOME/.nodebrew/current/bin:$PATH
-PATH=$HOME/.anaconda3/anaconda/bin:$PATH
-PATH=$GOPATH/bin:$PATH
-
-export PATH
+fignore=(.o .obj .bak .hi .deps .meta .asset .mdb .sln .unity)
 
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
-export GEM_HOME=$HOME/.gem
+hash -d dl=~/Downloads
+hash -d box=~/Dropbox
 
-export PATH=$HOME/Library/Android/sdk/platform-tools:$PATH
-export PATH=$HOME/Library/Android/android-ndk-r10e:$PATH
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export STUDIO_JDK=/Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk
+# OCaml
+. $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+
+# Haskell
+export PATH=$HOME/.local/bin:$PATH
+alias ghc='stack ghc --'
+alias ghci='stack ghci --'
+alias runghc='stack runghc --'
+alias st='stack install --test --file-watch'
+
+# Ruby
+export RBENV_SHELL=zsh
+export GEM_HOME=$HOME/.gem
+export PATH=$HOME/.rbenv/shims:$HOME/.gem/bin:$PATH
+
+# Go
+export GOPATH=$HOME/in/go
+export PATH=$GOPATH/bin:$PATH
+
+# Rust
+export PATH=$HOME/.cargo/bin:$PATH
+
+# Node
+export PATH=$HOME/.nodebrew/current/bin:$PATH
+
+# .NET
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+alias dot='TERM=xterm dotnet'
+
+# Scala
+alias sbt='TERM=xterm sbt'
+
+# Objective-C
+alias objc='clang -fobjc-arc -fobjc-exceptions -fobjc-arc-exceptions -w -framework Foundation'
+
+# Docker
+alias d='docker'
+alias dc='docker-compose'
+alias dr='d run --rm -it'
+alias dcr='dc run --rm'
+alias dl='d ps -lq'
+alias dex='d exec -it'
+dclean() {
+  d rm `d ps -aq`
+  d volume rm `d volume ls -f dangling=true -q`
+  d rmi `d images -f dangling=true -q`
+}
 
 bindkey '^f' forward-word
 bindkey '^b' backward-word
 
-autoload -Uz compinit
-compinit
 autoload colors
 colors
 
@@ -83,6 +131,9 @@ setopt auto_pushd
 setopt list_types
 setopt pushd_ignore_dups
 setopt auto_remove_slash
+
+autoload -Uz compinit
+compinit
 
 zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*:cd:*' ignore-parents parent pwd
@@ -97,92 +148,13 @@ PROMPT='%{${fg[green]}%}[%n@%m %~]%{${reset_color}%}
 %(!.#.$) '
 
 umask 022
-alias v='vim'
-alias g='git'
-alias dex='d exec -it'
-alias ghc='stack ghc --'
-alias ghci='stack ghci --'
-alias runghc='stack runghc --'
-alias st='stack install --test --file-watch'
-alias mkdir='mkdir -p'
-alias zip='zip -r'
-alias -g H=' | head'
-alias -g T=' | tail'
-alias -g G=' | grep'
-alias -g L=' | less'
-alias -g P=' | peco'
-alias -g X=' | xargs'
-alias objc='clang -fobjc-arc -fobjc-exceptions -fobjc-arc-exceptions -w -framework Foundation'
-alias testserver='python -m http.server'
-fignore=(.o .obj .bak .hi .deps .meta .asset .mdb .sln .unity)
-
-alias d='docker'
-alias dc='docker-compose'
-alias dr='d run --rm -it'
-alias dcr='dc run --rm'
-alias dl='d ps -lq'
-dclean() {
-  d rm `d ps -aq`
-  d volume rm `d volume ls -f dangling=true -q`
-  d rmi `d images -f dangling=true -q`
-}
-
-hash -d box=~/Dropbox
 
 autoload -Uz zmv
 alias zmv='noglob zmv -w'
 
-alias c='cd ..'
-
-chpwd() {
-  s
-}
-
-cdroot() {
-  cd `git rev-parse --show-toplevel`
-}
-
-htags() {
-  ctags -R --languages=C --langmap=C:.h.c
-  find -name \*.\*hs X hasktags -ac
-  sort -o tags tags
-}
-
-cdfind() {
-  local dir="$( find . -path "**/.git" -prune -o -type d | sed -e 's;\./;;' | peco )"
-  if [ ! -z "$dir" ] ; then
-    cd "$dir"
-  fi
-}
-
 precmd() {
   print -Pn "\e]0;%n@%m %~\a %(!.#.$)"
 }
-
-extract() {
-  if [ -f $1 ] ; then
-      case $1 in
-          *.tar.bz2)   tar xvjf $1    ;;
-          *.tar.gz)    tar xvzf $1    ;;
-          *.tar.xz)    tar xvJf $1    ;;
-          *.bz2)       bunzip2 $1     ;;
-          *.rar)       unrar x $1     ;;
-          *.gz)        gunzip $1      ;;
-          *.tar)       tar xvf $1     ;;
-          *.tbz2)      tar xvjf $1    ;;
-          *.tgz)       tar xvzf $1    ;;
-          *.zip)       unzip $1       ;;
-          *.Z)         uncompress $1  ;;
-          *.7z)        7z x $1        ;;
-          *.lzma)      lzma -dv $1    ;;
-          *.xz)        xz -dv $1      ;;
-          *)           echo "don't know how to extract '$1'...";;
-      esac
-  else
-      echo "'$1' is not a valid file!"
-  fi
-}
-alias ex='extract'
 
 source ~/.config/zsh/auto-fu.zsh
 source ~/.config/zsh/auto-fu-ext.zsh
@@ -215,5 +187,3 @@ linux*)
   fi
   ;;
 esac
-
-. $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
