@@ -54,6 +54,7 @@ if dein#load_state(s:dein_dir)
   call dein#add('jreybert/vimagit')
 
   " language support
+  call dein#add('kongo2002/fsharp-vim')
   call dein#add('eagletmt/ghcmod-vim')
   call dein#add('eagletmt/neco-ghc')
   call dein#add('mattn/emmet-vim')
