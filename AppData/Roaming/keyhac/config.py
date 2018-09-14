@@ -301,6 +301,11 @@ class StandardWin(Box):
         if win.getText() == "" and win.getClassName() != "mintty": return False
         if not win.isVisible(): return False
         if win.isMinimized(): return False
+        rect = win.getRect()
+        if rect[0] == rect[2] or rect[1] == rect[3]: return False
+
+        # ignore VR related applications
+        if win.getText() == "SteamVR" or win.getText() == "SteamVR ステータス" or win.getText() == "vrmonitor": return False
         # ignore explorer.exe
         if win.getClassName() == "Progman": return False
         # ignore NVIDIA GeForce Overlay
