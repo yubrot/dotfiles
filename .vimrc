@@ -54,30 +54,11 @@ if dein#load_state(s:dein_dir)
   call dein#add('jreybert/vimagit')
 
   " language support
-  call dein#add('kongo2002/fsharp-vim')
-  call dein#add('eagletmt/ghcmod-vim')
-  call dein#add('eagletmt/neco-ghc')
-  call dein#add('mattn/emmet-vim')
   call dein#add('leafgarland/typescript-vim')
   call dein#add('rust-lang/rust.vim')
   call dein#add('cespare/vim-toml')
-  call dein#add('elixir-lang/vim-elixir')
-  " call dein#add('slimv.vim')
   call dein#add('rhysd/vim-llvm')
   call dein#add('derekwyatt/vim-scala')
-  call dein#add('keith/swift.vim')
-  call dein#add('reasonml/vim-reason-loader')
-  if s:is_darwin
-    call dein#add('OmniSharp/omnisharp-vim', {
-    \ 'lazy': 1,
-    \ 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] },
-    \ 'build': {
-    \   'windows' : 'msbuild server/OmniSharp.sln',
-    \   'mac': 'xbuild server/OmniSharp.sln',
-    \   'unix': 'xbuild server/OmniSharp.sln',
-    \   }
-    \ })
-  endif
 
   call dein#end()
   call dein#save_state()
@@ -172,7 +153,6 @@ command JSON :%!python -m json.tool
 nnoremap s <Nop>
 nnoremap Q <Nop>
 nnoremap <Esc><Esc> :nohl<CR>
-autocmd FileType haskell nnoremap <buffer> <Esc><Esc> :nohl<CR>:GhcModTypeClear<CR><Esc>
 
 nnoremap [org] <Nop>
 map <Space> [org]
@@ -274,13 +254,6 @@ nnoremap Y y$
 nnoremap + <C-a>
 nnoremap - <C-x>
 
-nnoremap \gt :GhcModType<CR>
-nnoremap \gi :GhcModTypeInsert<CR>
-nnoremap \gc :GhcModCheckAndLintAsync<CR>
-
-let g:necoghc_enable_detailed_browse=1
-"autocmd FileType haskell setlocal iskeyword=a-z,A-Z,_,.,39
-
 nnoremap \c :make %<CR>
 let b:quickrun_config = {'outputter/buffer/split': "", 'outputter/buffer/into': 1}
 let g:quickrun_config = {}
@@ -373,13 +346,6 @@ if !s:is_msys
   endif
 
   let g:neocomplete#force_omni_input_patterns.ocaml = '[^. *\t]\.\w*\|\h\w*|#'
-
-  if s:is_darwin
-    autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-  endif
-
-  let g:haskellmode_completion_ghc = 0
-  autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
 endif
 
 autocmd FileType javascript,typescript inoremap <buffer><expr> @ smartchr#one_of('this.', '@')
