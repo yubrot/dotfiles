@@ -51,14 +51,6 @@ function init()
     -- Option(Alt) + [1-9] で対応するスペースに移動するようにシステムの環境設定を行うことで動作する
     hs.hotkey.bind({"alt", "shift"}, key, focusedWin(hs.fnutils.applyR(hs.window.moveToSpace, key)))
   end
-
-  for key, op in pairs({pageup = "+", pagedown = "-"}) do
-    hs.hotkey.bind({}, key, function()
-      local _, volume = hs.applescript.applescript("output volume of (get volume settings) " .. op .. " 1")
-      hs.alert.show("volume " .. volume , 1)
-      hs.applescript.applescript("set volume output volume " .. volume)
-    end)
-  end
 end
 
 do

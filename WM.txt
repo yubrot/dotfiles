@@ -21,6 +21,3 @@ super + m              最大化切り替え
 super + [1-9]          仮想デスクトップの切り替え
 super + shift + [1-9]  ウィンドウと共に仮想デスクトップの切り替え
 
-pageup                 volume up (Hammerspoon)
-pagedown               volume down (Hammerspoon)
-
