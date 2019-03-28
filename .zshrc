@@ -81,7 +81,7 @@ export PATH=$HOME/.local/bin:$PATH
 alias ghc='stack ghc --'
 alias ghci='stack ghci --'
 alias runghc='stack runghc --'
-alias st='stack install --test --file-watch'
+alias stacktest='stack test --file-watch --coverage --fast'
 
 # Ruby
 export RBENV_SHELL=zsh
