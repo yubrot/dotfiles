@@ -100,6 +100,8 @@ export PATH=$HOME/.nodebrew/current/bin:$PATH
 
 # .NET
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+export DOTNET_CLI_UI_LANGUAGE=en-us
+export PATH=$HOME/.dotnet/tools:$PATH
 alias dot='TERM=xterm dotnet'
 
 # Scala
