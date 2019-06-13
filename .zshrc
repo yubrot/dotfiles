@@ -122,6 +122,14 @@ dclean() {
   d volume rm `d volume ls -f dangling=true -q`
   d rmi `d images -f dangling=true -q`
 }
+alias k='kubectl'
+alias kex='k exec -it'
+
+# gcloud
+export CLOUDSDK_PYTHON=/usr/bin/python2
+export PATH=$HOME/.google-cloud-sdk/bin:$PATH
+if [ -f "$HOME/.google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/.google-cloud-sdk/path.zsh.inc"; fi
+if [ -f "$HOME/.google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/.google-cloud-sdk/completion.zsh.inc"; fi
 
 bindkey '^f' forward-word
 bindkey '^b' backward-word
