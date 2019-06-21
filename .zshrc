@@ -89,6 +89,7 @@ export GEM_HOME=$HOME/.gem
 export PATH=$HOME/.rbenv/shims:$HOME/.gem/bin:$PATH
 
 # Go
+export GOROOT=/usr/lib/go
 export GOPATH=$HOME/in/go
 export PATH=$GOPATH/bin:$PATH
 
@@ -123,6 +124,7 @@ dclean() {
   d rmi `d images -f dangling=true -q`
 }
 alias k='kubectl'
+alias kr='k run --rm -it --restart=Never'
 alias kex='k exec -it'
 
 # gcloud
