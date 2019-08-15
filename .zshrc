@@ -183,7 +183,10 @@ zstyle ':auto-fu:var' autoable-function/skiplbuffers \
   'journalctl *' 'scp *' 'rsync *' 'rustc *' './gradlew *' \
   './bin/rails *' './bin/rake *' 'brew *'
 
-source ~/.config/zsh/vcs-info.zsh
+if [ "${OSTYPE}" != "msys" ]; then
+  source ~/.config/zsh/vcs-info.zsh
+fi
+
 source ~/.local.zsh
 
 # case $- in *i*)
