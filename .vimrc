@@ -25,10 +25,6 @@ if dein#load_state(s:dein_dir)
   call dein#add('Shougo/unite.vim')
   call dein#add('Shougo/vimfiler.vim')
 
-  if !s:is_msys
-    call dein#add('Shougo/neocomplete.vim')
-  endif
-
   " core
   call dein#add('w0ng/vim-hybrid')
   call dein#add('ctrlpvim/ctrlp.vim')
@@ -298,55 +294,6 @@ let g:paredit_shortmaps = 1
 au BufNewFile,BufRead *.purs setf haskell
 au BufNewFile,BufRead Guardfile set filetype=ruby
 au BufNewFile,BufRead *.gradle set filetype=groovy
-
-if !s:is_msys
-  let g:neocomplete#enable_at_startup = 1
-  let g:neocomplete#enable_smart_case = 1
-  let g:neocomplete#sources#syntax#min_keyword_length = 3
-  let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-
-  " Define dictionary.
-  let g:neocomplete#sources#dictionary#dictionaries = {
-      \ 'default' : '',
-      \ 'vimshell' : $HOME.'/.vimshell_hist',
-      \ 'scheme' : $HOME.'/.gosh_completions'
-      \ }
-
-  if !exists('g:neocomplete#keyword_patterns')
-      let g:neocomplete#keyword_patterns = {}
-  endif
-  let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-  inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-  function! s:my_cr_function()
-    return neocomplete#smart_close_popup() . "\<CR>"
-  endfunction
-
-  imap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-
-  inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-  inoremap <expr><C-e> neocomplete#cancel_popup()
-
-  " Enable omni completion.
-  autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-  autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-  autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-  autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-  autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-  " Enable heavy omni completion.
-  if !exists('g:neocomplete#sources#omni#input_patterns')
-    let g:neocomplete#sources#omni#input_patterns = {}
-  endif
-
-  let g:neocomplete#sources#omni#input_patterns.cs = '.*[^=\);]'
-
-  if !exists('g:neocomplete#force_omni_input_patterns')
-    let g:neocomplete#force_omni_input_patterns = {}
-  endif
-
-  let g:neocomplete#force_omni_input_patterns.ocaml = '[^. *\t]\.\w*\|\h\w*|#'
-endif
 
 autocmd FileType javascript,typescript inoremap <buffer><expr> @ smartchr#one_of('this.', '@')
 

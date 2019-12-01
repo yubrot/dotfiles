@@ -89,8 +89,9 @@ export GEM_HOME=$HOME/.gem
 export PATH=$HOME/.rbenv/shims:$HOME/.gem/bin:$PATH
 
 # Go
+export GO111MODULE=on
 export GOROOT=/usr/lib/go
-export GOPATH=$HOME/in/go
+export GOPATH=$HOME/.go
 export PATH=$GOPATH/bin:$PATH
 
 # Rust
@@ -178,8 +179,8 @@ zstyle ':auto-fu:highlight' input bold
 zstyle ':auto-fu:var' postdisplay $''
 zstyle ':auto-fu:var' disable magic-space
 zstyle ':auto-fu:var' autoable-function/skiplbuffers \
-  'yaourt *' 'pacman *' 'sudo pacman *' 'adb * *' 'g *' \
-  'stack * *' 'st *' 'j *' 'd * *' 'dc * *' 'npm *' 'java *' \
+  'yay *' 'pacman *' 'sudo pacman *' 'adb * *' 'g *' \
+  'stack * *' 'd * *' 'dc * *' 'k * *' 'npm *' 'java *' \
   'journalctl *' 'scp *' 'rsync *' 'rustc *' './gradlew *' \
   './bin/rails *' './bin/rake *' 'brew *'
 
