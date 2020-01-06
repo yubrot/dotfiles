@@ -55,6 +55,7 @@ if dein#load_state(s:dein_dir)
   call dein#add('cespare/vim-toml')
   call dein#add('rhysd/vim-llvm')
   call dein#add('derekwyatt/vim-scala')
+  call dein#add('idris-hackers/idris-vim')
 
   call dein#end()
   call dein#save_state()
