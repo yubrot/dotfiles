@@ -32,7 +32,6 @@ def configure(keymap):
 
     bind["U0-Return"] = keymap.ShellExecuteCommand(None, "C:/msys64/msys2_shell.cmd", "-mingw64", "C:/msys64/")
     bind["U0-S-C"] = focusedWin(lambda win: win.close())
-    bind["U0-R"] = keymap.ActivateWindowCommand("clnch.exe")
 
     focusDirCommand = lambda cond: focusedWin(lambda win: win.getNearestByDirection(cond).focus(), True)
     bind["U0-H"] = focusDirCommand(lambda r: r > pi*3/4 or -pi*3/4 > r)
@@ -314,8 +313,6 @@ class StandardWin(Box):
         if win.getClassName() == "ApplicationFrameWindow": return False
         # ignore CoreWindow
         if win.getClassName() == "Windows.UI.Core.CoreWindow": return False
-        # ignore clnch.exe
-        if win.getClassName() == "ClnchWindowClass": return False
         return True
 
 class Recorder:
