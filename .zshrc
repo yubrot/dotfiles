@@ -54,6 +54,7 @@ cdroot() {
 
 fignore=(.o .obj .bak .hi .deps .meta .asset .mdb .sln .unity)
 
+export PATH=$HOME/.local/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 hash -d dl=~/Downloads
@@ -63,7 +64,6 @@ hash -d box=~/Dropbox
 . $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
 # Haskell
-export PATH=$HOME/.local/bin:$PATH
 alias ghc='stack ghc --'
 alias ghci='stack ghci --'
 alias runghc='stack runghc --'

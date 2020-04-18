@@ -1,4 +1,5 @@
 export PATH=$HOME/AppData/Roaming/local/bin:$PATH
+export PATH=$HOME/.local/bin:$PATH
 export EDITOR=/usr/bin/vim
 
 alias cp='cp -apr'
