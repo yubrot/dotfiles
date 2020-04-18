@@ -215,13 +215,10 @@ nnoremap [org]gf :Gitv!<CR>
 
 if s:is_darwin
   vnoremap <silent> [org]y :w !pbcopy<CR><CR>
-  nnoremap <silent> [org]p :r !pbpaste<CR>
 elseif s:is_msys
   vnoremap <silent> [org]y :w !cat >/dev/clipboard<CR><CR>
-  nnoremap <silent> [org]p :r !cat /dev/clipboard<CR>
 else
-  vnoremap <silent> [org]y :w !xsel --display :0 -ib<CR><CR>
-  nnoremap <silent> [org]p :r !xsel --display :0 -ob<CR>
+  vnoremap <silent> [org]y :w !clip.exe<CR><CR>
 endif
 
 set pastetoggle=<F11>

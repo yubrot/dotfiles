@@ -30,20 +30,6 @@ linux*)
 
   use_exa_as_ls
   ;;
-msys*)
-  export PATH=$HOME/AppData/Roaming/local/bin:$PATH
-  export EDITOR=/usr/bin/vim
-
-  alias cp='cp -apr'
-  alias scp='scp -r'
-
-  alias ls='ls -XF --color=auto'
-  alias la='ls -A'
-  alias s='ls -I "*.meta" -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Contacts -I "3D Objects" -I Favorites -I "Local Settings" -I OneDrive -I PrintHood -I "Saved Games" -I Cookies -I Links -I NetHood -I Recent -I Searches -I SendTo -I Templates -I Tracing -I "My Documents" -I Videos -I "スタート メニュー" -I "\$Recycle.Bin"'
-
-  export TMUX_TMPDIR=~/.tmux.tmp
-  mkdir -p ~/.tmux.tmp
-  ;;
 esac
 
 alias c='cd ..'
@@ -184,22 +170,6 @@ zstyle ':auto-fu:var' autoable-function/skiplbuffers \
   'journalctl *' 'scp *' 'rsync *' 'rustc *' './gradlew *' \
   './bin/rails *' './bin/rake *' 'brew *'
 
-if [ "${OSTYPE}" != "msys" ]; then
-  source ~/.config/zsh/vcs-info.zsh
-fi
-
+source ~/.config/zsh/vcs-info.zsh
 source ~/.local.zsh
 
-# case $- in *i*)
-#   [ -z "$TMUX" ] && exec tmux
-# esac
-
-case "${OSTYPE}" in
-linux*)
-  if [ -x /usr/bin/Xvfb ] && [ -x /usr/bin/VBoxClient ] && [ ! -f /tmp/.X0-lock ]; then
-    Xvfb -screen 0 1x1x8 > /dev/null 2>&1 &!
-    sleep 0.5
-    DISPLAY=:0 VBoxClient --clipboard
-  fi
-  ;;
-esac

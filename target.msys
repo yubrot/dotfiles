@@ -1,12 +1,6 @@
-.zshrc
-.config/zsh
-.config/peco
-.minttyrc
+.bashrc
 .vimrc
 .gitconfig
-.ghci
 .local/bin/diff-highlight
 .gitignore.global
 AppData/Roaming/keyhac/config.py
-.tmux.conf
-.gemrc

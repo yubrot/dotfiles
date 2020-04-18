@@ -1,5 +1,4 @@
 .zshrc
-.Xmodmap
 .config/zsh
 .config/peco
 .vimrc
