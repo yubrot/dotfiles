@@ -1,423 +1,447 @@
-﻿import os
-import os.path
-from datetime import datetime
-from math import *
-from keyhac import *
-from PIL import Image
+﻿import keyhac
+import math
+from enum import Enum
+from typing import Tuple, List, Set, Dict, Optional, Any
+from functools import cmp_to_key
 
-def configure(keymap):
+
+def configure(keymap: Any) -> None:
+    ms = MonitorSet()
+    for i, monitor_info in enumerate(keyhac.Window.getMonitorInfo()):
+        box = Box(monitor_info[1])
+        ms.register(Monitor(i, box))
+
+    fs = FrameSet()
+    fs.initialize(
+        Frame("TopLeft", 0, (0, 0.25, 0.5), (0, 0.3, 0.5),
+              {Direction.BOTTOM: "Left", Direction.RIGHT: "Left"}),
+        Frame("Left", 0, (0, 0.25, 0.5), (0, 0.5, 1),
+              {Direction.TOP: "TopLeft", Direction.BOTTOM: "BottomLeft", Direction.RIGHT: "Center"}),
+        Frame("BottomLeft", 0, (0, 0.25, 0.5), (0.5, 0.7, 1),
+              {Direction.TOP: "Left", Direction.RIGHT: "Left"}),
+        Frame("Center", 0, (0.2, 0.5, 0.8), (0.05, 0.5, 0.95),
+              {Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
+        Frame("TopRight", 0, (0.5, 0.75, 1), (0, 0.3, 0.5),
+              {Direction.BOTTOM: "Right", Direction.LEFT: "Right"}),
+        Frame("Right", 0, (0.5, 0.75, 1), (0, 0.5, 1),
+              {Direction.TOP: "TopRight", Direction.BOTTOM: "BottomRight", Direction.LEFT: "Center"}),
+        Frame("BottomRight", 0, (0.5, 0.75, 1), (0.5, 0.7, 1),
+              {Direction.TOP: "Right", Direction.LEFT: "Right"}))
+    fs.populate(ms, 15)
+
+    def is_ignored_window(win: Any) -> bool:
+        if win.getText() == "":
+            return True
+        if not win.isVisible():
+            return True
+        if win.isMinimized():
+            return True
+        rect = win.getRect()
+        if rect[0] == rect[2] or rect[1] == rect[3]:
+            return True
+
+        # ignore VR related applications
+        if win.getText() == "SteamVR" or win.getText() == "SteamVR ステータス" or win.getText() == "vrmonitor":
+            return True
+        # ignore explorer.exe
+        if win.getClassName() == "Progman":
+            return True
+        # ignore NVIDIA GeForce Overlay
+        if win.getClassName() == "CEF-OSC-WIDGET":
+            return True
+        # ignore ApplicationFrameWindow
+        if win.getClassName() == "ApplicationFrameWindow":
+            return True
+        # ignore CoreWindow
+        if win.getClassName() == "Windows.UI.Core.CoreWindow":
+            return True
+        return False
+
+    Operation.is_ignored_window = is_ignored_window
+    Operation.get_top_level_window = keymap.getTopLevelWindow
+
     keymap.clipboard_history.maxnum = 1
-
-    JobQueue.createDefaultQueue()
-    StandardWin.getTopLevelWindow = keymap.getTopLevelWindow
-    Balloon.pop = keymap.popBalloon
 
     # treat Muhenkan as U0
     keymap.replaceKey("(29)", 235)
     keymap.defineModifier(235, "User0")
 
-    spaces = Spaces(9)
     bind = keymap.defineWindowKeymap()
-    recorder = Recorder(JobQueue.defaultQueue(), 'D:\\record\\')
-
     bind["BACKSLASH"] = keymap.InputKeyCommand("S-UNDERSCORE")
 
-    def reload():
-        recorder.dispose()
-        keymap.command_ReloadConfig()
+    bind["U0-C-R"] = keymap.command_ReloadConfig
 
-    bind["U0-C-R"] = reload
+    bind["U0-Return"] = keymap.ShellExecuteCommand(None, "wt.exe", "", "")
+    bind["U0-S-C"] = Operation.close_window
 
-    # bind["U0-V"] = keymap.MouseButtonClickCommand()
+    bind["U0-M"] = Operation.toggle_maximize_window
 
-    bind["U0-Return"] = keymap.ShellExecuteCommand(None, "C:/msys64/msys2_shell.cmd", "-mingw64", "C:/msys64/")
-    bind["U0-S-C"] = focusedWin(lambda win: win.close())
+    bind["U0-K"] = lambda: Operation.focus_frame_by_direction(fs, Direction.TOP)
+    bind["U0-J"] = lambda: Operation.focus_frame_by_direction(fs, Direction.BOTTOM)
+    bind["U0-H"] = lambda: Operation.focus_frame_by_direction(fs, Direction.LEFT)
+    bind["U0-L"] = lambda: Operation.focus_frame_by_direction(fs, Direction.RIGHT)
 
-    focusDirCommand = lambda cond: focusedWin(lambda win: win.getNearestByDirection(cond).focus(), True)
-    bind["U0-H"] = focusDirCommand(lambda r: r > pi*3/4 or -pi*3/4 > r)
-    bind["U0-J"] = focusDirCommand(lambda r: pi/4 < r and r < pi*3/4)
-    bind["U0-K"] = focusDirCommand(lambda r: -pi*3/4 < r and r < -pi/4)
-    bind["U0-L"] = focusDirCommand(lambda r: -pi/4 < r and r < pi/4)
-    bind["U0-I"] = focusedWin(lambda win: win.getNearestWindow().focus(), True)
-    bind["U0-O"] = focusedWin(lambda win: win.getOtherScreenWindow().focus(), True)
+    bind["U0-I"] = lambda: Operation.focus_window_in_frame(fs, +1)
+    bind["U0-O"] = lambda: Operation.focus_window_in_frame(fs, -1)
 
-    bind["U0-S-H"] = focusedWin(lambda win: win.resizeWithGrids(-0.046875, 0))
-    bind["U0-S-L"] = focusedWin(lambda win: win.resizeWithGrids( 0.046875, 0))
+    bind["U0-E"] = lambda: Operation.move_window_by_direction(fs, Direction.TOP)
+    bind["U0-D"] = lambda: Operation.move_window_by_direction(fs, Direction.BOTTOM)
+    bind["U0-S"] = lambda: Operation.move_window_by_direction(fs, Direction.LEFT)
+    bind["U0-F"] = lambda: Operation.move_window_by_direction(fs, Direction.RIGHT)
 
-    bind["U0-S"] = focusedWin(lambda win: win.setBox(win.grid().west))
-    bind["U0-F"] = focusedWin(lambda win: win.setBox(win.grid().east))
-    bind["U0-S-I"] = focusedWin(lambda win: win.setBox(win.grid()))
-    bind["U0-S-O"] = focusedWin(lambda win: win.moveToOtherScreen())
+    bind["U0-S-I"] = lambda: Operation.reset_window_size(fs)
 
-    bind["U0-M"] = focusedWin(lambda win: win.toggleMaximize())
+    bind["U0-S-K"] = lambda: Operation.resize_window_by_direction(fs, Direction.TOP, 50)
+    bind["U0-S-J"] = lambda: Operation.resize_window_by_direction(fs, Direction.BOTTOM, 50)
+    bind["U0-S-H"] = lambda: Operation.resize_window_by_direction(fs, Direction.LEFT, 50)
+    bind["U0-S-L"] = lambda: Operation.resize_window_by_direction(fs, Direction.RIGHT, 50)
 
-    bind["U0-Q"] = focusedWin(lambda win: recorder.toggle(win))
+    Operation.reactivate_binds()
 
-    bind["U0-S-D"] = dump
 
-    switchCommand = lambda index: lambda: spaces.switchTo(index)
-    switchWithWinCommand = lambda index: focusedWin(lambda win: spaces.switchTo(index, win))
+class Vector:
+    def __init__(self, x: float, y: float) -> None:
+        self.x = x
+        self.y = y
 
-    for i in range(9):
-        key = str(i + 1)
-        bind["U0-" + key] = switchCommand(i)
-        bind["U0-S-" + key] = switchWithWinCommand(i)
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Vector) and self.x == other.x and self.y == other.y
 
-    # reactivate binds
-    bind["U0-I"]()
+    def __add__(self, other: "Vector") -> "Vector":
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other: "Vector") -> "Vector":
+        return Vector(self.x - other.x, self.y - other.y)
+
+    def __mul__(self, s: float) -> "Vector":
+        return Vector(self.x * s, self.y * s)
+
+    def distance_to(self, other: "Vector") -> float:
+        return abs(self.x - other.x) + abs(self.y - other.y)
+
+    def __str__(self) -> str:
+        return f"({self.x}, {self.y})"
+
 
 class Box:
-    # (x: (int, int, int, int)) -> Box
-    # (x, y, w, h: int) -> Box
-    def __init__(self, x, y = None, w = None, h = None):
-        self.rect = x if y is None else (int(x), int(y), int(x + w), int(y + h))
-        self.x = self.rect[0]
-        self.y = self.rect[1]
-        self.w = self.rect[2] - self.rect[0]
-        self.h = self.rect[3] - self.rect[1]
+    def __init__(self, rect: Tuple[float, float, float, float]) -> None:
+        self.min = Vector(rect[0], rect[1])
+        self.max = Vector(rect[2], rect[3])
 
-    def __eq__(self, other):
-        return self.rect == other.rect
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Box) and self.min == other.min and self.max == other.max
 
-    # (b: Box) -> Box
-    def intersect(a, b):
-        ar = a.rect
-        br = b.rect
-        x = max(ar[0], br[0])
-        y = max(ar[1], br[1])
-        xe = min(ar[2], br[2])
-        ye = min(ar[3], br[3])
-        return Box(x, y, max(xe - x, 0), max(ye - y, 0))
+    def size(self) -> Vector:
+        return self.max - self.min
 
-    # () -> (int, int)
-    def center(self):
-        return (floor((self.rect[0] + self.rect[2]) / 2), floor((self.rect[1] + self.rect[3]) / 2))
+    def center(self) -> Vector:
+        return (self.max + self.min) * 0.5
 
-    # () -> int
-    def size(self):
-        return self.w * self.h
+    def rect(self) -> Tuple[int, int, int, int]:
+        return (int(self.min.x), int(self.min.y), int(self.max.x), int(self.max.y))
 
-    # (b: Box) -> int
-    def distanceTo(a, b):
-        ac = a.center()
-        bc = b.center()
-        return abs(ac[0] - bc[0]) + abs(ac[1] - bc[1])
+    def __str__(self) -> str:
+        return f"({self.min.x}, {self.min.y} .. {self.max.x}, {self.max.y})"
 
-    # (b: Box) -> float
-    def radianTo(a, b):
-        ac = a.center()
-        bc = b.center()
-        return atan2(bc[1] - ac[1], bc[0] - ac[0])
 
-    # <T: Box>(ls: T[]) -> T
-    def getContainer(self, ls):
-        return maxBy(lambda r: self.intersect(r).size(), ls)
+class Direction(Enum):
+    TOP = 0
+    BOTTOM = 1
+    LEFT = 2
+    RIGHT = 3
 
-class Space:
-    # () -> Space
-    def __init__(self):
-        self.windows = []
-
-    # (withWin: StandardWin) -> void
-    def leave(self, withWin = None):
-        self.windows = [w for w in StandardWin.allWindows() if not withWin or w != withWin]
-        for w in self.windows: w.win.minimize()
-
-    # () -> void
-    def enter(self):
-        for w in self.windows: w.win.restore()
-
-class Spaces:
-    # (count: int) -> void
-    def __init__(self, count):
-        self.desktops = [Space() for _ in range(count)]
-        self.current = 0
-
-    # (index: int, withWin: StandardWin) -> void
-    def switchTo(self, index, withWin = None):
-        if index == self.current: return
-        self.desktops[self.current].leave(withWin)
-        self.desktops[index].enter()
-        self.current = index
-
-class Screen(Box):
-    # (monitorInfo: MonitorInfo) -> Screen
-    def __init__(self, monitorInfo):
-        Box.__init__(self, monitorInfo[1])
-        self.next = self.prev = None
-
-    # () -> StandardWin[]
-    def windows(self):
-        return [w for w in StandardWin.allWindows() if w.screen() == self]
-
-    allScreensCache = None
-
-    # () -> Screen[]
-    @classmethod
-    def allScreens(c):
-        if c.allScreensCache: return c.allScreensCache
-        c.allScreensCache = [c(m) for m in Window.getMonitorInfo()]
-        c.link(c.allScreensCache)
-        return c.allScreensCache
-
-    # (ls: Screen[]) -> void
-    @staticmethod
-    def link(ls):
-        for i, screen in enumerate(ls):
-            screen.next = ls[(i+1) % len(ls)]
-            screen.prev = ls[(i-1) % len(ls)]
-
-# TODO vertical separation
-class Grid(Box):
-    # (screen: Screen, ...) -> Grid
-    def __init__(self, screen, *args):
-        self.screen = screen
-        Box.__init__(self, *args)
-        self.north = self.south = self.east = self.west = self
-
-    allGridsCache = None
-
-    # (horizontalCount: int) -> Grid[]
-    @classmethod
-    def allGrids(c, horizontalCount = 2):
-        if c.allGridsCache: return c.allGridsCache
-        c.allGridsCache = [p for screen in Screen.allScreens() for p in c.partition(screen, horizontalCount)]
-        c.linkHorizontal(c.allGridsCache)
-        return c.allGridsCache
-
-    # (screen: Screen, horizontalCount: int) -> Grid[]
-    @classmethod
-    def partition(c, screen, horizontalCount = 2):
-        width = floor(screen.w / horizontalCount)
-        return [c(screen, screen.x + i * width, screen.y, width, screen.h) for i in range(horizontalCount)]
-
-    # (ls: Grid[]) -> void
-    @staticmethod
-    def linkHorizontal(ls):
-        for i, grid in enumerate(ls):
-            if i < len(ls) - 1: grid.east = ls[i+1]
-            if 0 < i: grid.west = ls[i-1]
-
-class Balloon:
-    pop = None
-
-class StandardWin(Box):
-    # (win: Window) -> StandardWin
-    def __init__(self, win):
-        self.win = win
-        Box.__init__(self, win.getRect())
-
-    def __eq__(a, b):
-        return a.win == b.win
-
-    # () -> Screen
-    def screen(self):
-        return self.getContainer(Screen.allScreens())
-
-    # () -> Grid
-    def grid(self):
-        return self.getContainer(Grid.allGrids())
-
-    # () -> void
-    def focus(self):
-        popup = self.win.getLastActivePopup()
-        if popup: popup.setForeground()
-
-    # () -> void
-    def close(self):
-        self.win.sendMessage(WM_SYSCOMMAND, SC_CLOSE)
-
-    # (box: Box) -> void
-    def setBox(self, box):
-        if box: self.win.setRect(box.rect)
-
-    # () -> void
-    def toggleMaximize(self):
-        if self.win.isMaximized():
-            self.win.restore()
+    def visit_order(self) -> List["Direction"]:
+        if self == Direction.TOP:
+            return [Direction.TOP, Direction.LEFT, Direction.RIGHT]
+        elif self == Direction.BOTTOM:
+            return [Direction.BOTTOM, Direction.LEFT, Direction.RIGHT]
+        elif self == Direction.LEFT:
+            return [Direction.LEFT, Direction.TOP, Direction.BOTTOM]
         else:
-            self.win.maximize()
+            return [Direction.RIGHT, Direction.TOP, Direction.BOTTOM]
 
-    # (cond: float -> bool) -> StandardWin
-    def getNearestByDirection(self, cond):
-        ls = [w for w in StandardWin.allWindows() if w != self and cond(self.radianTo(w))]
-        if not ls: return self
-        return minBy(lambda w: self.distanceTo(w), ls)
+    def vector(self) -> Vector:
+        if self == Direction.TOP:
+            return Vector(0, -1)
+        elif self == Direction.BOTTOM:
+            return Vector(0, 1)
+        elif self == Direction.LEFT:
+            return Vector(-1, 0)
+        else:
+            return Vector(1, 0)
 
-    # () -> StandardWin
-    def getNearestWindow(self):
-        ls = [w for w in self.screen().windows() if w != self]
-        if not ls: return self
-        return maxBy(lambda w: self.intersect(w).size() - self.distanceTo(w), ls)
 
-    # () -> StandardWin
-    def getOtherScreenWindow(self):
-        for w in StandardWin.allWindows():
-            if w.screen() != self.screen(): return w
-        return self
+MonitorId = int
 
-    # () -> void
-    def moveToOtherScreen(self):
-        a = self.screen()
-        b = self.screen().next
-        self.setBox(Box(self.x + (b.x - a.x), self.y + (b.y - a.y), self.w, self.h))
 
-    # (x, y: float) -> void
-    def resizeWithGrids(self, x, y):
-        x = x * self.screen().w
-        y = y * self.screen().h
+class Monitor:
+    def __init__(self, id: MonitorId, box: Box) -> None:
+        self.id = id
+        self.box = box
 
-        g = self.grid()
-        self.setBox(Box(
-            self.x + x if g.east is g or g.east.screen != g.screen else self.x,
-            self.y - y if g.south is g or g.south.screen != g.screen else self.y,
-            self.w + x * (1 if g.west is g or g.west.screen != g.screen else -1),
-            self.h - y * (1 if g.north is g or g.north.screen != g.screen else -1)
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Monitor) and self.id == other.id
+
+    def map(self, vec: Vector) -> Vector:
+        return Vector(
+            self.box.min.x*(1 - vec.x) + self.box.max.x*vec.x,
+            self.box.min.y*(1 - vec.y) + self.box.max.y*vec.y)
+
+    def __str__(self) -> str:
+        return f"Monitor({self.id}, {self.box})"
+
+
+class MonitorSet:
+    def __init__(self) -> None:
+        self.items: Dict[int, Monitor] = {}
+
+    def register(self, monitor: Monitor) -> None:
+        self.items[monitor.id] = monitor
+
+    def get(self, id: MonitorId) -> Monitor:
+        return self.items[id]
+
+    def contains(self, id: MonitorId) -> bool:
+        return id in self.items
+
+
+FrameId = str
+
+
+class Frame:
+    def __init__(self,
+                 id: FrameId,
+                 monitor: MonitorId,
+                 x: Tuple[float, float, float],
+                 y: Tuple[float, float, float],
+                 links: Dict[Direction, FrameId]) -> None:
+        self.id = id
+        self.monitor = monitor
+        self.box = Box((x[0], y[0], x[2], y[2]))
+        self.base = Vector(x[1], y[1])
+        self.links = links
+        self.latest_window: Optional[int] = None
+        t = 1 if Direction.TOP in links else 0
+        b = 1 if Direction.BOTTOM in links else 0
+        l = 1 if Direction.LEFT in links else 0
+        r = 1 if Direction.RIGHT in links else 0
+        self.scaler = Box((
+            -1 if l == r else l,
+            -1 if t == b else t,
+            1 if l == r else r,
+            1 if t == b else b,
         ))
 
-    getTopLevelWindow = None
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Frame) and self.id == other.id
 
-    # () -> StandardWin
-    @classmethod
-    def focusedWindow(c):
-        win = c.getTopLevelWindow()
-        return c(win) if c.isStandard(win) else None
+    def populate(self, ms: MonitorSet, padding: int) -> None:
+        if not ms.contains(self.monitor):
+            raise Exception(f"Unknown montior {self.monitor}")
+        monitor = ms.get(self.monitor)
 
-    # () -> StandardWin[]
-    @classmethod
-    def allWindows(c):
-        ret = []
-        def f(win, _):
-            if c.isStandard(win): ret.append(c(win))
-            return True
-        Window.enum(f, None)
+        def map(v: Vector, f: float) -> Vector:
+            px = 1 if v.x in {0, 1} else 0.5
+            py = 1 if v.y in {0, 1} else 0.5
+            return monitor.map(v) + Vector(px, py) * f
+
+        self.box.min = map(self.box.min, padding)
+        self.box.max = map(self.box.max, -padding)
+        self.base = monitor.map(self.base)
+
+    def __str__(self) -> str:
+        return f"Frame({self.id}, {self.box})"
+
+
+class FrameSet:
+    def __init__(self) -> None:
+        self.items: Dict[str, Frame] = {}
+
+    def register(self, frame: Frame) -> None:
+        self.items[frame.id] = frame
+
+    def get(self, id: FrameId) -> Frame:
+        return self.items[id]
+
+    def get_nearest(self, pos: Vector) -> Frame:
+        return min([(f.base.distance_to(pos), i, f) for i, f in enumerate(self.items.values())])[2]
+
+    def get_by_direction(self, base: Frame, dir: Direction) -> Optional[Frame]:
+        return self.items[base.links[dir]] if dir in base.links else None
+
+    def enumerate_by_direction(self, base: Frame, dir: Direction) -> List[Frame]:
+        todo = [self.get_by_direction(base, dir)]
+        done: Set[FrameId] = set([])
+        ret: List[Frame] = []
+        while todo:
+            f = todo.pop(0)
+            if f and f.id not in done:
+                done.add(f.id)
+                ret.append(f)
+                for d in dir.visit_order():
+                    todo.append(self.get_by_direction(f, d))
         return ret
 
-    # (win: Window) -> bool
-    @staticmethod
-    def isStandard(win):
-        if win is None: return False
-        if win.getText() == "" and win.getClassName() != "mintty": return False
-        if not win.isVisible(): return False
-        if win.isMinimized(): return False
-        rect = win.getRect()
-        if rect[0] == rect[2] or rect[1] == rect[3]: return False
+    def contains(self, id: FrameId) -> bool:
+        return id in self.items
 
-        # ignore VR related applications
-        if win.getText() == "SteamVR" or win.getText() == "SteamVR ステータス" or win.getText() == "vrmonitor": return False
-        # ignore explorer.exe
-        if win.getClassName() == "Progman": return False
-        # ignore NVIDIA GeForce Overlay
-        if win.getClassName() == "CEF-OSC-WIDGET": return False
-        # ignore ApplicationFrameWindow
-        if win.getClassName() == "ApplicationFrameWindow": return False
-        # ignore CoreWindow
-        if win.getClassName() == "Windows.UI.Core.CoreWindow": return False
+    def populate(self, ms: MonitorSet, padding: int) -> None:
+        for frame in self.items.values():
+            for id in frame.links.values():
+                if not self.contains(id):
+                    raise Exception(f"Unknown frame {id}")
+            frame.populate(ms, padding)
+
+    def initialize(self, *frames: Frame) -> None:
+        for frame in frames:
+            self.register(frame)
+
+
+class Operation:
+    get_top_level_window: Any = None
+
+    is_ignored_window: Any = None
+
+    @classmethod
+    def get_windows(c) -> List[Any]:
+        ret = []
+
+        def f(win, _):
+            if not c.is_ignored_window(win):
+                ret.append(win)
+            return True
+
+        keyhac.Window.enum(f, None)
+        return ret
+
+    @classmethod
+    def get_windows_in_frame(c, fs: FrameSet, frame: Frame) -> List[Any]:
+        def is_in_frame(win: Any) -> bool:
+            box = Box(win.getRect())
+            f = fs.get_nearest(box.center())
+            return frame == f
+        ret = [w for w in c.get_windows() if is_in_frame(w)]
+        ret.sort(key=cmp_to_key(lambda a, b: a.getHWND() - b.getHWND()))
+        return ret
+
+    @classmethod
+    def get_current_window(c) -> Any:
+        win = c.get_top_level_window()
+        return None if win is None or c.is_ignored_window(win) else win
+
+    @classmethod
+    def close_window(c) -> None:
+        win = c.get_current_window()
+        if win:
+            win.sendMessage(keyhac.WM_SYSCOMMAND, keyhac.SC_CLOSE)
+
+    @classmethod
+    def toggle_maximize_window(c) -> None:
+        win = c.get_current_window()
+        if win:
+            if win.isMaximized():
+                win.restore()
+            else:
+                win.maximize()
+
+    @classmethod
+    def reactivate_binds(c) -> None:
+        win = c.get_current_window()
+        for w in c.get_windows():
+            if w != win:
+                w.setForeground()
+                break
+
+    @classmethod
+    def focus_some_window(c, fs: FrameSet) -> bool:
+        for win in c.get_windows():
+            box = Box(win.getRect())
+            base = fs.get_nearest(box.center())
+            base.latest_window = win.getHWND()
+            win.setForeground()
+            return True
+        return False
+
+    @classmethod
+    def focus_frame_by_direction(c, fs: FrameSet, dir: Direction, base: Optional[Frame] = None) -> bool:
+        if not base:
+            win = c.get_current_window()
+            if not win:
+                return c.focus_some_window(fs)
+            box = Box(win.getRect())
+            base = fs.get_nearest(box.center())
+
+        base.latest_window = win.getHWND()
+        for next_frame in fs.enumerate_by_direction(base, dir):
+            if c.focus_window_in_frame(fs, 0, next_frame):
+                return True
+        return False
+
+    @classmethod
+    def focus_window_in_frame(c, fs: FrameSet, offset: int, base: Optional[Frame] = None) -> bool:
+        win = c.get_current_window()
+        if not base:
+            if not win:
+                return c.focus_some_window(fs)
+            box = Box(win.getRect())
+            base = fs.get_nearest(box.center())
+
+        wins = c.get_windows_in_frame(fs, base)
+        if not wins:
+            return False
+
+        current: Optional[int] = None
+        for i, w in enumerate(wins):
+            if w == win:
+                current = i
+                break
+
+        if current is None and base.latest_window is not None:
+            for i, w in enumerate(wins):
+                if w.getHWND() == base.latest_window:
+                    current = i
+                    break
+
+        if current is None:
+            current = 0
+
+        next_win = wins[(current + offset) % len(wins)]
+        base.latest_window = next_win.getHWND()
+        next_win.setForeground()
         return True
 
-class Recorder:
-    # (context: JobQueue) -> Recorder
-    def __init__(self, context, baseDir):
-        self.cron = CronTable()
-        self.context = context
-        self.baseDir = baseDir
-        self.recordTargets = []
-        self.observer = None
-
-    # () -> void
-    def dispose(self):
-        for t in self.recordTargets: self.cron.remove(t.cronItem)
-        if self.observer: self.cron.remove(self.observer)
-        self.cron.destroy()
-
-    # (win: StandardWin) -> void
-    def start(self, win):
-        targetDir = self.baseDir + '\\' + datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-        if os.path.exists(targetDir): return
-        os.mkdir(targetDir)
-
-        t = RecordTarget(win, targetDir)
-        t.cronItem = CronItem(t.capture, 0.2)
-        self.cron.add(t.cronItem)
-        self.recordTargets.append(t)
-        Balloon.pop("", "Recording " + t.target.win.getText() + " started.", 2000)
-
-        if self.observer: return
-        self.observer = CronItem(
-                lambda _: self.context.enqueue(JobItem(None, self.checkStopped)), 5.0)
-        self.cron.add(self.observer)
-
-    # (t: RecordTarget) -> void
-    def stop(self, t):
-        if not t.cronItem: return
-        self.cron.remove(t.cronItem)
-        t.cronItem = None
-        self.recordTargets.remove(t)
-        Balloon.pop("", "Recording " + (t.target.win.getText() or "(closed)") + " stopped.", 2000)
-
-    # (win: StandardWin) -> int
-    def toggle(self, win):
-        for t in self.recordTargets:
-            if t.target != win: continue
-            self.stop(t)
+    @classmethod
+    def move_window_by_direction(c, fs: FrameSet, dir: Direction) -> None:
+        win = c.get_current_window()
+        if not win:
             return
-        self.start(win)
+        box = Box(win.getRect())
+        frame = fs.get_nearest(box.center())
+        next_frame = fs.get_by_direction(frame, dir)
+        if next_frame:
+            next_frame.latest_window = win.getHWND()
+            win.setRect(next_frame.box.rect())
 
-    # (_) -> void
-    def checkStopped(self, _):
-        for t in self.recordTargets:
-            if t.target.win.isEnabled(): continue
-            self.stop(t)
+    @classmethod
+    def reset_window_size(c, fs: FrameSet) -> None:
+        win = c.get_current_window()
+        if not win:
             return
+        box = Box(win.getRect())
+        frame = fs.get_nearest(box.center())
+        frame.latest_window = win.getHWND()
+        win.setRect(frame.box.rect())
 
-class RecordTarget:
-    # (target: StandardWin, dirPath: string) -> RecordTarget
-    def __init__(self, target, dirPath):
-        self.target = target
-        self.dirPath = dirPath
-        self.duplicateCheckThumbs = []
-        self.cronItem = None
-
-    # (_) -> void
-    def capture(self, _):
-        if not self.target.win.isEnabled(): return
-
-        i = self.target.win.getImage()
-        img = Image.frombytes("RGB", i.getSize(), i.getBuffer())
-        thumb = img.resize((32, 32))
-
-        for check in self.duplicateCheckThumbs:
-            diff = 0
-            for ((r1, g1, b1), (r2, g2, b2)) in zip(thumb.getdata(), check.getdata()):
-                diff = diff + abs(r1 - r2) + abs(g1 - g2) + abs(b1 - b2)
-            if diff < 30000: return
-
-        self.duplicateCheckThumbs.append(thumb)
-        while len(self.duplicateCheckThumbs) > 5: self.duplicateCheckThumbs.pop(0)
-        path = self.dirPath + '\\' + datetime.now().strftime("%m_%d_%H_%M_%S_%f.jpg")
-        img.save(path, 'JPEG', quality=95, optimize=True)
-
-# <T>(f: T -> ordered, T[]) -> T
-def maxBy(f, ls):
-    return max([(f(a), i, a) for i, a in enumerate(ls)])[2]
-
-# <T>(f: T -> ordered, T[]) -> T
-def minBy(f, ls):
-    return min([(f(a), i, a) for i, a in enumerate(ls)])[2]
-
-# (f: StandardWin -> void, orFocus: bool) -> () -> void
-def focusedWin(f, orFocus = False):
-    def ret():
-        win = StandardWin.focusedWindow()
-        if win:
-            f(win)
-        elif orFocus:
-            for w in StandardWin.allWindows():
-                w.focus()
-                return
-    return ret
-
-def dump():
-    for w in StandardWin.allWindows():
-        print(w.win.getText(), ": ", w.win.getClassName())
-
+    @classmethod
+    def resize_window_by_direction(c, fs: FrameSet, dir: Direction, l: float) -> None:
+        win = c.get_current_window()
+        if not win:
+            return
+        box = Box(win.getRect())
+        frame = fs.get_nearest(box.center())
+        frame.latest_window = win.getHWND()
+        box.min.x = box.min.x + dir.vector().x * frame.scaler.min.x * l
+        box.min.y = box.min.y + dir.vector().y * frame.scaler.min.y * l
+        box.max.x = box.max.x + dir.vector().x * frame.scaler.max.x * l
+        box.max.y = box.max.y + dir.vector().y * frame.scaler.max.y * l
+        win.setRect(box.rect())
