@@ -1,10 +1,10 @@
 .zshrc
 .config/zsh
 .config/peco
+.config/pycodestyle
 .vimrc
 .gitconfig
 .ghci
-.local/bin/diff-highlight
 .gitignore.global
 .tmux.conf
 .gemrc

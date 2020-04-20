@@ -1,6 +1,5 @@
 .bashrc
 .vimrc
 .gitconfig
-.local/bin/diff-highlight
 .gitignore.global
 AppData/Roaming/keyhac/config.py

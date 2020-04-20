@@ -2,10 +2,10 @@
 .config/zsh
 .config/peco
 .config/karabiner
+.config/pycodestyle
 .vimrc
 .gitconfig
 .ghci
-.local/bin/diff-highlight
 .gitignore.global
 .hammerspoon
 .tmux.conf
