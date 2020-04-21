@@ -14,19 +14,23 @@ def configure(keymap: Any) -> None:
     fs = FrameSet()
     fs.initialize(
         Frame("TopLeft", 0, (0, 0.25, 0.5), (0, 0.3, 0.5),
-              {Direction.BOTTOM: "Left", Direction.RIGHT: "Left"}),
+              {Direction.BOTTOM: "Left", Direction.RIGHT: "Center"}),
         Frame("Left", 0, (0, 0.25, 0.5), (0, 0.5, 1),
               {Direction.TOP: "TopLeft", Direction.BOTTOM: "BottomLeft", Direction.RIGHT: "Center"}),
         Frame("BottomLeft", 0, (0, 0.25, 0.5), (0.5, 0.7, 1),
-              {Direction.TOP: "Left", Direction.RIGHT: "Left"}),
-        Frame("Center", 0, (0.2, 0.5, 0.8), (0.05, 0.5, 0.95),
-              {Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
+              {Direction.TOP: "Left", Direction.RIGHT: "Center"}),
+        Frame("Top", 0, (0.25, 0.5, 0.75), (0, 0.2, 0.5),
+              {Direction.BOTTOM: "Center", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
+        Frame("Center", 0, (0.25, 0.5, 0.75), (0.1, 0.5, 0.9),
+              {Direction.TOP: "Top", Direction.BOTTOM: "Bottom", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
+        Frame("Bottom", 0, (0.25, 0.5, 0.75), (0.5, 0.8, 1),
+            {Direction.TOP: "Center", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
         Frame("TopRight", 0, (0.5, 0.75, 1), (0, 0.3, 0.5),
-              {Direction.BOTTOM: "Right", Direction.LEFT: "Right"}),
+              {Direction.BOTTOM: "Right", Direction.LEFT: "Center"}),
         Frame("Right", 0, (0.5, 0.75, 1), (0, 0.5, 1),
               {Direction.TOP: "TopRight", Direction.BOTTOM: "BottomRight", Direction.LEFT: "Center"}),
         Frame("BottomRight", 0, (0.5, 0.75, 1), (0.5, 0.7, 1),
-              {Direction.TOP: "Right", Direction.LEFT: "Right"}))
+              {Direction.TOP: "Right", Direction.LEFT: "Center"}))
     fs.populate(ms, 15)
 
     def is_ignored_window(win: Any) -> bool:
@@ -421,6 +425,9 @@ class Operation:
         if next_frame:
             next_frame.latest_window = win.getHWND()
             win.setRect(next_frame.box.rect())
+        else:
+            frame.latest_window = win.getHWND()
+            win.setRect(frame.box.rect())
 
     @classmethod
     def reset_window_size(c, fs: FrameSet) -> None:
