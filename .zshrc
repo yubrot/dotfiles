@@ -6,7 +6,7 @@ bindkey -e
 zstyle :compinstall filename '~/.zshrc'
 
 use_exa_as_ls() {
-  alias ls='exa -F'
+  alias ls='exa -F --group-directories-first'
   alias la='ls -a'
   alias s='ls --git-ignore -I "*.meta"'
 }
