@@ -8,6 +8,9 @@
   excludesfile = ~/.gitignore.global
   fscache = true
   ignorecase = false
+  pager = delta --dark --theme='Monokai Extended' --file-style='box' --hunk-style='plain'
+[interactive]
+  diffFilter = delta --color-only --dark --theme='Monokai Extended' --file-style='box' --hunk-style='plain'
 [merge]
   tool = vimdiff
   ff = false
