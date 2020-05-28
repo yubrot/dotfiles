@@ -48,7 +48,7 @@ chpwd() {
   s
 }
 
-cdroot() {
+cdr() {
   cd `git rev-parse --show-toplevel`
 }
 
@@ -57,17 +57,11 @@ fignore=(.o .obj .bak .hi .deps .meta .asset .mdb .sln .unity)
 export PATH=$HOME/.local/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
-hash -d dl=~/Downloads
-hash -d box=~/Dropbox
-
 # OCaml
 . $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
 # Haskell
-alias ghc='stack ghc --'
-alias ghci='stack ghci --'
-alias runghc='stack runghc --'
-alias stacktest='stack test --file-watch --coverage --fast'
+[ -f "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env" ] && source "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env"
 
 # Ruby
 export RBENV_SHELL=zsh
@@ -94,9 +88,6 @@ alias dot='TERM=xterm dotnet'
 
 # Scala
 alias sbt='TERM=xterm sbt'
-
-# Objective-C
-alias objc='clang -fobjc-arc -fobjc-exceptions -fobjc-arc-exceptions -w -framework Foundation'
 
 # Docker
 alias d='docker'

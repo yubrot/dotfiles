@@ -13,7 +13,7 @@ alias v='vim'
 alias g='git'
 alias mkdir='mkdir -p'
 
-cdroot() {
+cdr() {
   cd `git rev-parse --show-toplevel`
 }
 
