@@ -252,7 +252,6 @@ nnoremap \c :make %<CR>
 let b:quickrun_config = {'outputter/buffer/split': "", 'outputter/buffer/into': 1}
 let g:quickrun_config = {}
 let g:quickrun_config['swift'] = {'command': 'swift', 'exec': '%c %o %s'}
-let g:quickrun_config['haskell'] = {'command': 'stack', 'cmdopt': 'runghc --', 'exec': '%c %o %s'}
 
 autocmd QuickFixCmdPost [^l]* nested cwindow
 

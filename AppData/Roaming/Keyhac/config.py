@@ -24,14 +24,16 @@ def configure(keymap: Any) -> None:
         Frame("Center", 0, (0.25, 0.5, 0.75), (0.1, 0.5, 0.9),
               {Direction.TOP: "Top", Direction.BOTTOM: "Bottom", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
         Frame("Bottom", 0, (0.25, 0.5, 0.75), (0.5, 0.8, 1),
-            {Direction.TOP: "Center", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
+              {Direction.TOP: "Center", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
         Frame("TopRight", 0, (0.5, 0.75, 1), (0, 0.3, 0.5),
-              {Direction.BOTTOM: "Right", Direction.LEFT: "Center"}),
+              {Direction.BOTTOM: "Right", Direction.LEFT: "Center", Direction.RIGHT: "Sub"}),
         Frame("Right", 0, (0.5, 0.75, 1), (0, 0.5, 1),
-              {Direction.TOP: "TopRight", Direction.BOTTOM: "BottomRight", Direction.LEFT: "Center"}),
+              {Direction.TOP: "TopRight", Direction.BOTTOM: "BottomRight", Direction.LEFT: "Center", Direction.RIGHT: "Sub"}),
         Frame("BottomRight", 0, (0.5, 0.75, 1), (0.5, 0.7, 1),
-              {Direction.TOP: "Right", Direction.LEFT: "Center"}))
-    fs.populate(ms, 15)
+              {Direction.TOP: "Right", Direction.LEFT: "Center", Direction.RIGHT: "Sub"}),
+        Frame("Sub", 1, (0, 0.5, 1), (0, 0.5, 1),
+              {Direction.LEFT: "Right"}))
+    fs.populate(ms, 0)
 
     def is_ignored_window(win: Any) -> bool:
         if win.getText() == "":
@@ -225,10 +227,10 @@ class Frame:
         self.base = Vector(x[1], y[1])
         self.links = links
         self.latest_window: Optional[int] = None
-        t = 1 if Direction.TOP in links else 0
-        b = 1 if Direction.BOTTOM in links else 0
-        l = 1 if Direction.LEFT in links else 0
-        r = 1 if Direction.RIGHT in links else 0
+        t = 1 if y[0] != 0 else 0
+        b = 1 if y[2] != 1 else 0
+        l = 1 if x[0] != 0 else 0
+        r = 1 if x[2] != 1 else 0
         self.scaler = Box((
             -1 if l == r else l,
             -1 if t == b else t,
