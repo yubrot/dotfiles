@@ -241,19 +241,21 @@ class Frame:
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Frame) and self.id == other.id
 
-    def populate(self, ms: MonitorSet, padding: int) -> None:
+    def populate(self, ms: MonitorSet, padding: int) -> bool:
         if not ms.contains(self.monitor):
-            raise Exception(f"Unknown montior {self.monitor}")
+            print(f"Unknown montior {self.monitor}")
+            return False
         monitor = ms.get(self.monitor)
 
-        def map(v: Vector, f: float) -> Vector:
+        def map_with_offset(v: Vector, f: float) -> Vector:
             px = 1 if v.x in {0, 1} else 0.5
             py = 1 if v.y in {0, 1} else 0.5
             return monitor.map(v) + Vector(px, py) * f
 
-        self.box.min = map(self.box.min, padding)
-        self.box.max = map(self.box.max, -padding)
+        self.box.min = map_with_offset(self.box.min, padding)
+        self.box.max = map_with_offset(self.box.max, -padding)
         self.base = monitor.map(self.base)
+        return True
 
     def __str__(self) -> str:
         return f"Frame({self.id}, {self.box})"
@@ -277,7 +279,7 @@ class FrameSet:
 
     def enumerate_by_direction(self, base: Frame, dir: Direction) -> List[Frame]:
         todo = [self.get_by_direction(base, dir)]
-        done: Set[FrameId] = set([])
+        done: Set[FrameId] = set()
         ret: List[Frame] = []
         while todo:
             f = todo.pop(0)
@@ -292,11 +294,20 @@ class FrameSet:
         return id in self.items
 
     def populate(self, ms: MonitorSet, padding: int) -> None:
+        missing_frames: Set[FrameId] = set()
         for frame in self.items.values():
             for id in frame.links.values():
                 if not self.contains(id):
                     raise Exception(f"Unknown frame {id}")
-            frame.populate(ms, padding)
+            if not frame.populate(ms, padding):
+                missing_frames.add(frame.id)
+
+        for id in missing_frames:
+            del self.items[id]
+            for frame in self.items.values():
+                missing_links = [k for k, v in frame.links.items() if v in missing_frames]
+                for dir in missing_links:
+                    del frame.links[dir]
 
     def initialize(self, *frames: Frame) -> None:
         for frame in frames:
