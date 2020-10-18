@@ -30,7 +30,7 @@ if dein#load_state(s:dein_dir)
   call dein#add('ctrlpvim/ctrlp.vim')
   call dein#add('nathanaelkane/vim-indent-guides')
   call dein#add('LeafCage/foldCC')
-  call dein#add('rking/ag.vim')
+  call dein#add('jremmen/vim-ripgrep')
   call dein#add('vim-scripts/yanktmp.vim')
   call dein#add('vim-scripts/sudo.vim')
   call dein#add('tpope/vim-surround')
@@ -164,7 +164,7 @@ nnoremap L gt
 
 nnoremap [org]f :call ModifiedCheck()<CR>:VimFiler<CR>
 nnoremap [org]o :call ModifiedCheck()<CR>:CtrlP<CR>
-nnoremap [org]a :call ModifiedCheck()<CR>:Ag 
+nnoremap [org]r :call ModifiedCheck()<CR>:Rg 
 nnoremap [org]w :w<CR>
 
 function! ModifiedCheck()
