@@ -8,15 +8,16 @@
   excludesfile = ~/.gitignore.global
   fscache = true
   ignorecase = false
-  pager = delta --dark --theme='Monokai Extended' --file-style='box' --hunk-style='plain'
+  pager = delta
 [interactive]
-  diffFilter = delta --color-only --dark --theme='Monokai Extended' --file-style='box' --hunk-style='plain'
+  diffFilter = delta --color-only
 [merge]
   tool = vimdiff
   ff = false
 [diff]
   tool = vimdiff
   algorithm = patience
+  colorMoved = default
   compactionHeuristic = true
 [pull]
   rebase = true
@@ -41,3 +42,7 @@
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
+[delta]
+  line-numbers = true
+  line-numbers-right-format = "{np:>4}｜"
+  syntax-theme = Monokai Extended

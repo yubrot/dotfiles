@@ -1,8 +1,4 @@
 .zshrc
-.config/zsh
-.config/peco
-.config/karabiner
-.config/pycodestyle
 .vimrc
 .gitconfig
 .ghci
@@ -11,3 +7,7 @@
 .tmux.conf
 .gemrc
 .ocamlinit
+.config/peco
+.config/karabiner
+.config/pycodestyle
+.config/starship.toml

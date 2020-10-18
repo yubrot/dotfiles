@@ -33,22 +33,20 @@ linux*)
 esac
 
 alias c='cd ..'
+alias cdr='cdroot'
 alias v='vim'
 alias g='git'
 alias lss='ls -lh'
 alias mkdir='mkdir -p'
 alias zip='zip -r'
 alias testserver='python -m http.server'
-alias -g H=' | head'
-alias -g T=' | tail'
 alias -g G=' | grep'
-alias -g L=' | less'
 
 chpwd() {
   s
 }
 
-cdr() {
+cdroot() {
   cd `git rev-parse --show-toplevel`
 }
 
@@ -130,12 +128,11 @@ zstyle ':completion:*:cd:*' ignore-parents parent pwd
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*' completer _oldlist _complete _ignored
 
-setopt prompt_subst
-setopt IGNOREEOF
+setopt ignoreeof
+
 WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+
 stty stop undef
-PROMPT='%{${fg[green]}%}[%n@%m %~]%{${reset_color}%}
-%(!.#.$) '
 
 umask 022
 
@@ -146,21 +143,14 @@ precmd() {
   print -Pn "\e]0;%n@%m %~\a %(!.#.$)"
 }
 
-source ~/.config/zsh/auto-fu.zsh
-source ~/.config/zsh/auto-fu-ext.zsh
+eval "$(starship init zsh)"
 
-zle-line-init () { auto-fu-init; }
-zle -N zle-line-init
-
-zstyle ':auto-fu:highlight' input bold
-zstyle ':auto-fu:var' postdisplay $''
-zstyle ':auto-fu:var' disable magic-space
-zstyle ':auto-fu:var' autoable-function/skiplbuffers \
-  'yay *' 'pacman *' 'sudo pacman *' 'adb * *' 'g *' \
-  'stack * *' 'd * *' 'dc * *' 'k * *' 'npm *' 'java *' \
-  'journalctl *' 'scp *' 'rsync *' 'rustc *' './gradlew *' \
-  './bin/rails *' './bin/rake *' 'brew *'
-
-source ~/.config/zsh/vcs-info.zsh
-source ~/.local.zsh
+ZSH_AUTOSUGGEST_STRATEGY=(completion)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_USE_ASYNC=true
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# workaround https://github.com/zsh-users/zsh-autosuggestions/issues/512
+_zsh_autosuggest_capture_postcompletion() {
+  unset 'compstate[list]'
+}
 

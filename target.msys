@@ -2,4 +2,5 @@
 .vimrc
 .gitconfig
 .gitignore.global
+.config/starship.toml
 AppData/Roaming/keyhac/config.py
