@@ -56,10 +56,14 @@ export PATH=$HOME/.local/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 # OCaml
-. $HOME/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+. $HOME/.opam/opam-init/init.zsh >/dev/null 2>&1 || true
 
 # Haskell
 [ -f "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env" ] && source "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env"
+
+# LLVM
+export LLVMENV_RUST_BINDING=1
+command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
 
 # Ruby
 export RBENV_SHELL=zsh
