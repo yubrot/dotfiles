@@ -47,3 +47,5 @@
   line-numbers-left-format  = "{np:>4}￤"
   line-numbers-right-format = "{np:>4}｜"
   syntax-theme = Monokai Extended
+[init]
+  defaultBranch = main
