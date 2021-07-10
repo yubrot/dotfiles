@@ -29,6 +29,8 @@ linux*)
   alias scp='scp -r'
 
   use_exa_as_ls
+
+  export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
   ;;
 esac
 
