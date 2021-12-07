@@ -304,10 +304,10 @@ class FrameSet:
 
         for id in missing_frames:
             del self.items[id]
-            for frame in self.items.values():
-                missing_links = [k for k, v in frame.links.items() if v in missing_frames]
-                for dir in missing_links:
-                    del frame.links[dir]
+        for frame in self.items.values():
+            missing_links = [k for k, v in frame.links.items() if v in missing_frames]
+            for dir in missing_links:
+                del frame.links[dir]
 
     def initialize(self, *frames: Frame) -> None:
         for frame in frames:
