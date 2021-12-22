@@ -150,6 +150,7 @@ precmd() {
 }
 
 eval "$(starship init zsh)"
+eval "$(direnv hook zsh)"
 
 ZSH_AUTOSUGGEST_STRATEGY=(completion)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
