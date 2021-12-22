@@ -13,18 +13,12 @@ use_exa_as_ls() {
 
 case "${OSTYPE}" in
 darwin*)
-  export PATH=/Applications/MacVim.app/Contents/MacOS:$PATH
-  export EDITOR=/Applications/MacVim.app/Contents/MacOS/Vim
-  alias vim='Vim'
-
   alias cp='cp -apR'
   alias scp='scp -r'
 
   use_exa_as_ls
   ;;
 linux*)
-  export EDITOR=/usr/bin/vim
-
   alias cp='cp -apr'
   alias scp='scp -r'
 
@@ -43,6 +37,8 @@ alias mkdir='mkdir -p'
 alias zip='zip -r'
 alias testserver='python -m http.server'
 alias -g G=' | grep'
+
+export EDITOR=/usr/bin/vim
 
 chpwd() {
   s
