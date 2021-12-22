@@ -1,0 +1,10 @@
+#!/bin/bash
+
+use_java() {
+  if [ "$#" -ne 1 ]; then
+    echo "usage: use java VERSION" >&2
+    return 1
+  fi
+  export JAVA_HOME="$(/usr/libexec/java_home -v "$1")"
+  PATH_add $JAVA_HOME/bin
+}
