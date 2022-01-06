@@ -88,6 +88,8 @@ alias dot='TERM=xterm dotnet'
 
 # Scala
 alias sbt='TERM=xterm sbt'
+export PATH=$HOME/Library/Application\ Support/Coursier/bin:$PATH
+export PATH=$HOME/.local/share/coursier/bin:$PATH
 
 # Docker
 alias d='docker'
