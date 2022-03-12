@@ -86,6 +86,10 @@ export DOTNET_CLI_UI_LANGUAGE=en-us
 export PATH=$HOME/.dotnet/tools:$PATH
 alias dot='TERM=xterm dotnet'
 
+# Java
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
+
 # Scala
 alias sbt='TERM=xterm sbt'
 export PATH=$HOME/Library/Application\ Support/Coursier/bin:$PATH
@@ -159,4 +163,3 @@ ZSH_AUTOSUGGEST_USE_ASYNC=true
 _zsh_autosuggest_capture_postcompletion() {
   unset 'compstate[list]'
 }
-
