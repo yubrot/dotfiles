@@ -19,7 +19,7 @@ function init()
     Frame.new("Left", 1, 0, 0.25, 0.5, 0, 0.5, 1, {[Direction.top] = "TopLeft", [Direction.bottom] = "BottomLeft", [Direction.right] = "Center"}),
     Frame.new("BottomLeft", 1, 0, 0.25, 0.5, 0.5, 0.7, 1, {[Direction.top] = "Left", [Direction.right] = "Center"}),
     Frame.new("Top", 1, 0.25, 0.5, 0.75, 0, 0.2, 0.5, {[Direction.bottom] = "Center", [Direction.left] = "Left", [Direction.right] = "Right"}),
-    Frame.new("Center", 1, 0.25, 0.5, 0.75, 0.1, 0.5, 0.9, {[Direction.top] = "Top", [Direction.bottom] = "Bottom", [Direction.left] = "Left", [Direction.right] = "Right"}),
+    Frame.new("Center", 1, 0.2, 0.5, 0.8, 0.05, 0.5, 0.95, {[Direction.top] = "Top", [Direction.bottom] = "Bottom", [Direction.left] = "Left", [Direction.right] = "Right"}),
     Frame.new("Bottom", 1, 0.25, 0.5, 0.75, 0.5, 0.8, 1, {[Direction.top] = "Center", [Direction.left] = "Left", [Direction.right] = "Right"}),
     Frame.new("TopRight", 1, 0.5, 0.75, 1, 0, 0.3, 0.5, {[Direction.bottom] = "Right", [Direction.left] = "Center", [Direction.right] = "Sub"}),
     Frame.new("Right", 1, 0.5, 0.75, 1, 0, 0.5, 1, {[Direction.top] = "TopRight", [Direction.bottom] = "BottomRight", [Direction.left] = "Center", [Direction.right] = "Sub"}),

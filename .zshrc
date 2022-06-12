@@ -112,7 +112,6 @@ alias kr='k run --rm -it --restart=Never'
 alias kex='k exec -it'
 
 # gcloud
-export CLOUDSDK_PYTHON=/usr/bin/python2
 export PATH=$HOME/.google-cloud-sdk/bin:$PATH
 if [ -f "$HOME/.google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/.google-cloud-sdk/path.zsh.inc"; fi
 if [ -f "$HOME/.google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/.google-cloud-sdk/completion.zsh.inc"; fi
@@ -163,3 +162,7 @@ ZSH_AUTOSUGGEST_USE_ASYNC=true
 _zsh_autosuggest_capture_postcompletion() {
   unset 'compstate[list]'
 }
+
+# Add JBang to environment
+alias j!=jbang
+export PATH="$HOME/.jbang/bin:$PATH"

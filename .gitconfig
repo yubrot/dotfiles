@@ -49,6 +49,8 @@
   syntax-theme = Monokai Extended
 [init]
   defaultBranch = main
+[url "git@github.com:"]
+  insteadOf = https://github.com/
 [credential "https://github.com"]
   helper = 
   helper = !/usr/bin/gh auth git-credential
