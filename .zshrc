@@ -97,7 +97,7 @@ export PATH=$HOME/.local/share/coursier/bin:$PATH
 
 # Docker
 alias d='docker'
-alias dc='docker-compose'
+alias dc='docker compose'
 alias dr='d run --rm -it'
 alias dcr='dc run --rm'
 alias dl='d ps -lq'
