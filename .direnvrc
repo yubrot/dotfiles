@@ -8,3 +8,12 @@ use_java() {
   export JAVA_HOME="$(/usr/libexec/java_home -v "$1")"
   PATH_add $JAVA_HOME/bin
 }
+
+use_ruby() {
+  if [ "$#" -ne 1 ]; then
+    echo "usage: use ruby VERSION" >&2
+    return 1
+  fi
+  load_prefix $HOME/.rubies/$1
+  layout ruby
+}

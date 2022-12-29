@@ -2,13 +2,12 @@
 .zshrc
 .vimrc
 .gitconfig
-.ghci
 .gitignore.global
-.hammerspoon
 .tmux.conf
+.ghci
 .gemrc
 .ocamlinit
-.config/peco
-.config/karabiner
-.config/pycodestyle
 .config/starship.toml
+.config/pycodestyle
+.config/karabiner
+.hammerspoon

@@ -2,11 +2,10 @@
 .zshrc
 .vimrc
 .gitconfig
-.ghci
 .gitignore.global
 .tmux.conf
+.ghci
 .gemrc
 .ocamlinit
-.config/peco
-.config/pycodestyle
 .config/starship.toml
+.config/pycodestyle

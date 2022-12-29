@@ -1,5 +1,5 @@
-.bashrc
 .direnvrc
+.bashrc
 .vimrc
 .gitconfig
 .gitignore.global
