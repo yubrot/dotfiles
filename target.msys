@@ -4,4 +4,5 @@
 .gitconfig
 .gitignore.global
 .config/starship.toml
+.config/bat/config
 AppData/Roaming/keyhac/config.py

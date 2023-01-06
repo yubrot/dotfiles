@@ -8,4 +8,5 @@
 .gemrc
 .ocamlinit
 .config/starship.toml
+.config/bat/config
 .config/pycodestyle
