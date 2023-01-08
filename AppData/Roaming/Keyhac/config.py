@@ -13,26 +13,26 @@ def configure(keymap: Any) -> None:
 
     fs = FrameSet()
     fs.initialize(
-        Frame("TopLeft", 0, (0, 0.25, 0.5), (0, 0.3, 0.5),
+        Frame("TopLeft", 1, (0, 0.25, 0.5), (0, 0.3, 0.5),
               {Direction.BOTTOM: "Left", Direction.RIGHT: "Center"}),
-        Frame("Left", 0, (0, 0.25, 0.5), (0, 0.5, 1),
+        Frame("Left", 1, (0, 0.25, 0.5), (0, 0.5, 1),
               {Direction.TOP: "TopLeft", Direction.BOTTOM: "BottomLeft", Direction.RIGHT: "Center"}),
-        Frame("BottomLeft", 0, (0, 0.25, 0.5), (0.5, 0.7, 1),
-              {Direction.TOP: "Left", Direction.RIGHT: "Center"}),
-        Frame("Top", 0, (0.25, 0.5, 0.75), (0, 0.2, 0.5),
+        Frame("BottomLeft", 1, (0, 0.25, 0.5), (0.5, 0.7, 1),
+              {Direction.TOP: "Left", Direction.RIGHT: "Center", Direction.BOTTOM: "Sub"}),
+        Frame("Top", 1, (0.25, 0.5, 0.75), (0, 0.2, 0.5),
               {Direction.BOTTOM: "Center", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
-        Frame("Center", 0, (0.25, 0.5, 0.75), (0.1, 0.5, 0.9),
+        Frame("Center", 1, (0.18, 0.5, 0.82), (0.02, 0.5, 0.98),
               {Direction.TOP: "Top", Direction.BOTTOM: "Bottom", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
-        Frame("Bottom", 0, (0.25, 0.5, 0.75), (0.5, 0.8, 1),
-              {Direction.TOP: "Center", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
-        Frame("TopRight", 0, (0.5, 0.75, 1), (0, 0.3, 0.5),
-              {Direction.BOTTOM: "Right", Direction.LEFT: "Center", Direction.RIGHT: "Sub"}),
-        Frame("Right", 0, (0.5, 0.75, 1), (0, 0.5, 1),
-              {Direction.TOP: "TopRight", Direction.BOTTOM: "BottomRight", Direction.LEFT: "Center", Direction.RIGHT: "Sub"}),
-        Frame("BottomRight", 0, (0.5, 0.75, 1), (0.5, 0.7, 1),
-              {Direction.TOP: "Right", Direction.LEFT: "Center", Direction.RIGHT: "Sub"}),
-        Frame("Sub", 1, (0, 0.5, 1), (0, 0.5, 1),
-              {Direction.LEFT: "Right"}))
+        Frame("Bottom", 1, (0.25, 0.5, 0.75), (0.5, 0.8, 1),
+              {Direction.TOP: "Center", Direction.LEFT: "Left", Direction.RIGHT: "Right", Direction.BOTTOM: "Sub"}),
+        Frame("TopRight", 1, (0.5, 0.75, 1), (0, 0.3, 0.5),
+              {Direction.BOTTOM: "Right", Direction.LEFT: "Center"}),
+        Frame("Right", 1, (0.5, 0.75, 1), (0, 0.5, 1),
+              {Direction.TOP: "TopRight", Direction.BOTTOM: "BottomRight", Direction.LEFT: "Center"}),
+        Frame("BottomRight", 1, (0.5, 0.75, 1), (0.5, 0.7, 1),
+              {Direction.TOP: "Right", Direction.LEFT: "Center", Direction.BOTTOM: "Sub"}),
+        Frame("Sub", 0, (0, 0.5, 1), (0, 0.5, 1),
+              {Direction.TOP: "Bottom"}))
     fs.populate(ms, 0)
 
     def is_ignored_window(win: Any) -> bool:
@@ -97,10 +97,10 @@ def configure(keymap: Any) -> None:
 
     bind["U0-S-I"] = lambda: Operation.reset_window_size(fs)
 
-    bind["U0-S-K"] = lambda: Operation.resize_window_by_direction(fs, Direction.TOP, 50)
-    bind["U0-S-J"] = lambda: Operation.resize_window_by_direction(fs, Direction.BOTTOM, 50)
-    bind["U0-S-H"] = lambda: Operation.resize_window_by_direction(fs, Direction.LEFT, 50)
-    bind["U0-S-L"] = lambda: Operation.resize_window_by_direction(fs, Direction.RIGHT, 50)
+    bind["U0-S-K"] = lambda: Operation.resize_window_by_direction(fs, Direction.TOP, 45)
+    bind["U0-S-J"] = lambda: Operation.resize_window_by_direction(fs, Direction.BOTTOM, 45)
+    bind["U0-S-H"] = lambda: Operation.resize_window_by_direction(fs, Direction.LEFT, 45)
+    bind["U0-S-L"] = lambda: Operation.resize_window_by_direction(fs, Direction.RIGHT, 45)
 
     Operation.reactivate_binds()
 
@@ -304,6 +304,7 @@ class FrameSet:
 
         for id in missing_frames:
             del self.items[id]
+
         for frame in self.items.values():
             missing_links = [k for k, v in frame.links.items() if v in missing_frames]
             for dir in missing_links:
