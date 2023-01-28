@@ -63,11 +63,6 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 export LLVMENV_RUST_BINDING=1
 command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
 
-# Ruby
-export RBENV_SHELL=zsh
-export GEM_HOME=$HOME/.gem
-export PATH=$HOME/.rbenv/shims:$HOME/.gem/bin:$PATH
-
 # Go
 export GO111MODULE=on
 export GOROOT=/usr/lib/go
@@ -89,6 +84,8 @@ alias dot='TERM=xterm dotnet'
 # Java
 export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
+alias j!=jbang
+export PATH="$HOME/.jbang/bin:$PATH"
 
 # Scala
 alias sbt='TERM=xterm sbt'
@@ -150,9 +147,6 @@ precmd() {
   print -Pn "\e]0;%n@%m %~\a %(!.#.$)"
 }
 
-eval "$(starship init zsh)"
-eval "$(direnv hook zsh)"
-
 ZSH_AUTOSUGGEST_STRATEGY=(completion)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_USE_ASYNC=true
@@ -163,6 +157,6 @@ _zsh_autosuggest_capture_postcompletion() {
   unset 'compstate[list]'
 }
 
-# Add JBang to environment
-alias j!=jbang
-export PATH="$HOME/.jbang/bin:$PATH"
+eval "$(starship init zsh)"
+eval "$(direnv hook zsh)"
+
