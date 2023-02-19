@@ -1,21 +1,20 @@
 [include]
-  path = ~/.gitconfig.local
+  path = ~/.config/git/config.local
 [color]
   ui = true
 [core]
-  editor = vim
+  editor = nvim
   autocrlf = false
-  excludesfile = ~/.gitignore.global
   fscache = true
   ignorecase = false
   pager = delta
 [interactive]
   diffFilter = delta --color-only
 [merge]
-  tool = vimdiff
+  tool = nvimdiff
   ff = false
 [diff]
-  tool = vimdiff
+  tool = nvimdiff
   algorithm = patience
   colorMoved = default
   compactionHeuristic = true
@@ -23,6 +22,8 @@
   rebase = true
 [difftool]
   prompt = false
+[diftool "nvimdiff"]
+  cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
 [alias]
   s = status --short --branch
   a = add
@@ -33,7 +34,7 @@
   pls = "!git stash; git pl; git stash pop"
   f = fetch --prune
   fu = fetch --prune upstream
-  ag = grep --line-number --show-function --color --heading --break
+  rg = grep --line-number --show-function --color --heading --break
   history = log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cd %Cblue%cn %Cred%d %Creset%s'
 [push]
   default = current

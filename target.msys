@@ -1,8 +1,8 @@
-.direnvrc
 .bashrc
 .vimrc
-.gitconfig
-.gitignore.global
-.config/starship.toml
 .config/bat/config
+.config/direnv/direnvrc
+.config/git/config
+.config/git/ignore
+.config/starship.toml
 AppData/Roaming/keyhac/config.py
