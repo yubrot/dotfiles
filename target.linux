@@ -1,9 +1,9 @@
 .zshrc
-.vimrc
 .config/bat/config
 .config/direnv/direnvrc
 .config/git/config
 .config/git/ignore
+.config/nvim/init.lua
 .config/ocaml/init.ml
 .config/pycodestyle
 .config/starship.toml

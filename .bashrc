@@ -1,6 +1,6 @@
 export PATH=$HOME/AppData/Roaming/local/bin:$PATH
 export PATH=$HOME/.local/bin:$PATH
-export EDITOR=/usr/bin/vim
+export EDITOR='/c/Program Files/Neovim/bin/nvim.exe'
 
 alias cp='cp -apr'
 alias scp='scp -r'
@@ -10,7 +10,7 @@ alias s='ls -I "*.meta" -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Con
 alias lss='ls -lh'
 alias c='cd ..'
 alias cdr='cdroot'
-alias v='vim'
+alias v='nvim'
 alias g='git'
 alias mkdir='mkdir -p'
 

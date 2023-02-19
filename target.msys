@@ -1,8 +1,8 @@
 .bashrc
-.vimrc
 .config/bat/config
 .config/direnv/direnvrc
 .config/git/config
 .config/git/ignore
+.config/nvim/init.lua
 .config/starship.toml
 AppData/Roaming/keyhac/config.py

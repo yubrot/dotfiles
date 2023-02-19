@@ -15,30 +15,27 @@ case "${OSTYPE}" in
 darwin*)
   alias cp='cp -apR'
   alias scp='scp -r'
-
   use_exa_as_ls
+  export EDITOR=/usr/local/bin/nvim
   ;;
 linux*)
   alias cp='cp -apr'
   alias scp='scp -r'
-
   use_exa_as_ls
-
+  export EDITOR=/usr/bin/nvim
   export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
   ;;
 esac
 
 alias c='cd ..'
 alias cdr='cdroot'
-alias v='vim'
+alias v='nvim'
 alias g='git'
 alias lss='ls -lh'
 alias mkdir='mkdir -p'
 alias zip='zip -r'
-alias testserver='python -m http.server'
 alias -g G=' | grep'
 
-export EDITOR=/usr/bin/vim
 
 chpwd() {
   s
