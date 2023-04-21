@@ -16,7 +16,7 @@ darwin*)
   alias cp='cp -apR'
   alias scp='scp -r'
   use_exa_as_ls
-  export EDITOR=/usr/local/bin/nvim
+  export EDITOR=/opt/homebrew/bin/nvim
   export PATH=/opt/homebrew/bin:$PATH
   ;;
 linux*)
@@ -148,7 +148,7 @@ precmd() {
 ZSH_AUTOSUGGEST_STRATEGY=(completion)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_USE_ASYNC=true
-[ -d /usr/local/share/zsh-autosuggestions ] && source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+[ -d /opt/homebrew/share/zsh-autosuggestions ] && source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 [ -d /usr/share/zsh/plugins/zsh-autosuggestions ] && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 # workaround https://github.com/zsh-users/zsh-autosuggestions/issues/512
 _zsh_autosuggest_capture_postcompletion() {
