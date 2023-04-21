@@ -21,6 +21,7 @@ config.colors = { visual_bell = '#333333' }
 config.font = wezterm.font 'JetBrains Mono'
 config.font_size = 16
 config.window_frame = { font_size = 16 }
+config.send_composed_key_when_left_alt_is_pressed = true
 config.keys = {}
 
 local function add_command(key, action)
@@ -39,7 +40,8 @@ end
 add_command('t', wezterm.action.SpawnTab('DefaultDomain'))
 add_command('h', wezterm.action.ActivateTabRelative(-1))
 add_command('l', wezterm.action.ActivateTabRelative(1))
-add_command('+', wezterm.action.EmitEvent('inc-font-size'))
-add_command('-', wezterm.action.EmitEvent('dec-font-size'))
+-- Disabled due to buggy behavior
+-- add_command('+', wezterm.action.EmitEvent('inc-font-size'))
+-- add_command('-', wezterm.action.EmitEvent('dec-font-size'))
 
 return config
