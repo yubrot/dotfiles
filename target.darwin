@@ -1,5 +1,6 @@
 .zshrc
 .hammerspoon
+.config/wezterm/wezterm.lua
 .config/karabiner
 .config/bat/config
 .config/direnv/direnvrc

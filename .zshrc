@@ -17,6 +17,7 @@ darwin*)
   alias scp='scp -r'
   use_exa_as_ls
   export EDITOR=/usr/local/bin/nvim
+  export PATH=/opt/homebrew/bin:$PATH
   ;;
 linux*)
   alias cp='cp -apr'
@@ -80,7 +81,7 @@ alias dot='TERM=xterm dotnet'
 
 # Java
 export PATH="$HOME/.jenv/bin:$PATH"
-eval "$(jenv init -)"
+command -v jenv >/dev/null 2>&1 && eval "$(jenv init -)"
 alias j!=jbang
 export PATH="$HOME/.jbang/bin:$PATH"
 
