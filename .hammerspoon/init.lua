@@ -33,7 +33,7 @@ function init()
 
   hs.hotkey.bind({"alt", "ctrl"}, "r", hs.reload)
 
-  hs.hotkey.bind({"alt"}, "return", function() hs.applescript.applescript([[do shell script "/usr/bin/open -n -a iTerm"]]) end)
+  hs.hotkey.bind({"alt"}, "return", function() hs.applescript.applescript([[do shell script "/usr/bin/open -a WezTerm"]]) end)
   hs.hotkey.bind({"alt", "shift"}, "c", operation.closeWindow)
 
   hs.hotkey.bind({"alt"}, "m", operation.toggleMaximizeWindow)
