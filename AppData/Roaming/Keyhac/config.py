@@ -4,35 +4,18 @@ from enum import Enum
 from typing import Tuple, List, Set, Dict, Optional, Any
 from functools import cmp_to_key
 
-
 def configure(keymap: Any) -> None:
     ms = MonitorSet()
     for i, monitor_info in enumerate(keyhac.Window.getMonitorInfo()):
         box = Box(monitor_info[1])
         ms.register(Monitor(i, box))
 
+    h = [(0, 0.166, 0.333), (0.033, 0.333, 0.633), (0.333, 0.5, 0.666), (0.666, 0.832, 1)]
+    v = [(0, 0.25, 0.5), (0, 0.5, 1), (0.5, 0.75, 1)]
+    main = [Frame.panel(h, v, {Direction.BOTTOM: "0"}, 1, x, y) for x in range(len(h)) for y in range(len(v))]
+    sub = [Frame("0", 0, (0, 0.5, 1), (0, 0.5, 1), {Direction.TOP: "1-2-2"})]
     fs = FrameSet()
-    fs.initialize(
-        Frame("TopLeft", 1, (0, 0.25, 0.5), (0, 0.3, 0.5),
-              {Direction.BOTTOM: "Left", Direction.RIGHT: "Center"}),
-        Frame("Left", 1, (0, 0.25, 0.5), (0, 0.5, 1),
-              {Direction.TOP: "TopLeft", Direction.BOTTOM: "BottomLeft", Direction.RIGHT: "Center"}),
-        Frame("BottomLeft", 1, (0, 0.25, 0.5), (0.5, 0.7, 1),
-              {Direction.TOP: "Left", Direction.RIGHT: "Center", Direction.BOTTOM: "Sub"}),
-        Frame("Top", 1, (0.25, 0.5, 0.75), (0, 0.2, 0.5),
-              {Direction.BOTTOM: "Center", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
-        Frame("Center", 1, (0.18, 0.5, 0.82), (0.02, 0.5, 0.98),
-              {Direction.TOP: "Top", Direction.BOTTOM: "Bottom", Direction.LEFT: "Left", Direction.RIGHT: "Right"}),
-        Frame("Bottom", 1, (0.25, 0.5, 0.75), (0.5, 0.8, 1),
-              {Direction.TOP: "Center", Direction.LEFT: "Left", Direction.RIGHT: "Right", Direction.BOTTOM: "Sub"}),
-        Frame("TopRight", 1, (0.5, 0.75, 1), (0, 0.3, 0.5),
-              {Direction.BOTTOM: "Right", Direction.LEFT: "Center"}),
-        Frame("Right", 1, (0.5, 0.75, 1), (0, 0.5, 1),
-              {Direction.TOP: "TopRight", Direction.BOTTOM: "BottomRight", Direction.LEFT: "Center"}),
-        Frame("BottomRight", 1, (0.5, 0.75, 1), (0.5, 0.7, 1),
-              {Direction.TOP: "Right", Direction.LEFT: "Center", Direction.BOTTOM: "Sub"}),
-        Frame("Sub", 0, (0, 0.5, 1), (0, 0.5, 1),
-              {Direction.TOP: "Bottom"}))
+    fs.initialize(*main, *sub)
     fs.populate(ms, 0)
 
     def is_ignored_window(win: Any) -> bool:
@@ -97,10 +80,10 @@ def configure(keymap: Any) -> None:
 
     bind["U0-S-I"] = lambda: Operation.reset_window_size(fs)
 
-    bind["U0-S-K"] = lambda: Operation.resize_window_by_direction(fs, Direction.TOP, 45)
-    bind["U0-S-J"] = lambda: Operation.resize_window_by_direction(fs, Direction.BOTTOM, 45)
-    bind["U0-S-H"] = lambda: Operation.resize_window_by_direction(fs, Direction.LEFT, 45)
-    bind["U0-S-L"] = lambda: Operation.resize_window_by_direction(fs, Direction.RIGHT, 45)
+    bind["U0-S-K"] = lambda: Operation.resize_window_by_direction(fs, Direction.TOP, 125)
+    bind["U0-S-J"] = lambda: Operation.resize_window_by_direction(fs, Direction.BOTTOM, 125)
+    bind["U0-S-H"] = lambda: Operation.resize_window_by_direction(fs, Direction.LEFT, 125)
+    bind["U0-S-L"] = lambda: Operation.resize_window_by_direction(fs, Direction.RIGHT, 125)
 
     Operation.reactivate_binds()
 
@@ -259,6 +242,38 @@ class Frame:
 
     def __str__(self) -> str:
         return f"Frame({self.id}, {self.box})"
+
+    @classmethod
+    def panel(c,
+              h: List[Tuple[float, float, float]],
+              v: List[Tuple[float, float, float]],
+              e: Dict[Direction, FrameId],
+              p: int,
+              x: int,
+              y: int) -> "Frame":
+        dirs = {}
+
+        if y == 0:
+            if Direction.TOP in e: dirs[Direction.TOP] = e[Direction.TOP]
+        else:
+            dirs[Direction.TOP] = f"{p}-{x}-{y-1}"
+
+        if y == len(v) - 1:
+            if Direction.BOTTOM in e: dirs[Direction.BOTTOM] = e[Direction.BOTTOM]
+        else:
+            dirs[Direction.BOTTOM] = f"{p}-{x}-{y+1}"
+
+        if x == 0:
+            if Direction.LEFT in e: dirs[Direction.LEFT] = e[Direction.LEFT]
+        else:
+            dirs[Direction.LEFT] = f"{p}-{x-1}-{y}"
+
+        if x == len(h) - 1:
+            if Direction.RIGHT in e: dirs[Direction.RIGHT] = e[Direction.RIGHT]
+        else:
+            dirs[Direction.RIGHT] = f"{p}-{x+1}-{y}"
+
+        return c(f"{p}-{x}-{y}", p, h[x], v[y], dirs)
 
 
 class FrameSet:
