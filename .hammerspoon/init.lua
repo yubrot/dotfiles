@@ -13,19 +13,17 @@ function init()
     ms[i] = Monitor.new(i, Box.fromRect(screen:frame()))
   end
 
+  local h = {{0, 0.166, 0.333}, {0.033, 0.333, 0.633}, {0.333, 0.5, 0.666}, {0.666, 0.832, 1}}
+  local v = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}}
+  local frames = {}
+  for x = 1, #h do
+    for y = 1, #v do
+      table.insert(frames, Frame.panel(h, v, {[Direction.right] = "2"}, 1, x, y))
+    end
+  end
+  table.insert(frames, Frame.new("2", 2, {0, 0.5, 1}, {0, 0.5, 1}, {[Direction.left] = "1-4-2"}))
   local fs = FrameSet.new()
-  fs:initialize({
-    Frame.new("TopLeft", 1, 0, 0.25, 0.5, 0, 0.3, 0.5, {[Direction.bottom] = "Left", [Direction.right] = "Center"}),
-    Frame.new("Left", 1, 0, 0.25, 0.5, 0, 0.5, 1, {[Direction.top] = "TopLeft", [Direction.bottom] = "BottomLeft", [Direction.right] = "Center"}),
-    Frame.new("BottomLeft", 1, 0, 0.25, 0.5, 0.5, 0.7, 1, {[Direction.top] = "Left", [Direction.right] = "Center"}),
-    Frame.new("Top", 1, 0.25, 0.5, 0.75, 0, 0.2, 0.5, {[Direction.bottom] = "Center", [Direction.left] = "Left", [Direction.right] = "Right"}),
-    Frame.new("Center", 1, 0.2, 0.5, 0.8, 0.05, 0.5, 0.95, {[Direction.top] = "Top", [Direction.bottom] = "Bottom", [Direction.left] = "Left", [Direction.right] = "Right"}),
-    Frame.new("Bottom", 1, 0.25, 0.5, 0.75, 0.5, 0.8, 1, {[Direction.top] = "Center", [Direction.left] = "Left", [Direction.right] = "Right"}),
-    Frame.new("TopRight", 1, 0.5, 0.75, 1, 0, 0.3, 0.5, {[Direction.bottom] = "Right", [Direction.left] = "Center", [Direction.right] = "Sub"}),
-    Frame.new("Right", 1, 0.5, 0.75, 1, 0, 0.5, 1, {[Direction.top] = "TopRight", [Direction.bottom] = "BottomRight", [Direction.left] = "Center", [Direction.right] = "Sub"}),
-    Frame.new("BottomRight", 1, 0.5, 0.75, 1, 0.5, 0.7, 1, {[Direction.top] = "Right", [Direction.left] = "Center", [Direction.right] = "Sub"}),
-    Frame.new("Sub", 2, 0, 0.5, 1, 0, 0.5, 1, {[Direction.left] = "Right"}),
-  })
+  fs:initialize(frames)
   fs:populate(ms, 0)
 
   hs.window.animationDuration = 0
@@ -53,10 +51,10 @@ function init()
 
   hs.hotkey.bind({"alt", "shift"}, "i", function() operation.resetWindowSize(fs) end)
 
-  hs.hotkey.bind({"alt", "shift"}, "k", function() operation.resizeWindowByDirection(fs, Direction.top, 50) end)
-  hs.hotkey.bind({"alt", "shift"}, "j", function() operation.resizeWindowByDirection(fs, Direction.bottom, 50) end)
-  hs.hotkey.bind({"alt", "shift"}, "h", function() operation.resizeWindowByDirection(fs, Direction.left, 50) end)
-  hs.hotkey.bind({"alt", "shift"}, "l", function() operation.resizeWindowByDirection(fs, Direction.right, 50) end)
+  hs.hotkey.bind({"alt", "shift"}, "k", function() operation.resizeWindowByDirection(fs, Direction.top, 125) end)
+  hs.hotkey.bind({"alt", "shift"}, "j", function() operation.resizeWindowByDirection(fs, Direction.bottom, 125) end)
+  hs.hotkey.bind({"alt", "shift"}, "h", function() operation.resizeWindowByDirection(fs, Direction.left, 125) end)
+  hs.hotkey.bind({"alt", "shift"}, "l", function() operation.resizeWindowByDirection(fs, Direction.right, 125) end)
 end
 
 Vector = {}
@@ -234,16 +232,16 @@ Monitor.mt = {
 
 Frame = {}
 
-function Frame.new(id, monitorId, x1, x2, x3, y1, y2, y3, links)
-  local t = y1 ~= 0 and 1 or 0
-  local b = y3 ~= 1 and 1 or 0
-  local l = x1 ~= 0 and 1 or 0
-  local r = x3 ~= 1 and 1 or 0
+function Frame.new(id, monitorId, x, y, links)
+  local t = y[1] ~= 0 and 1 or 0
+  local b = y[3] ~= 1 and 1 or 0
+  local l = x[1] ~= 0 and 1 or 0
+  local r = x[3] ~= 1 and 1 or 0
   return setmetatable({
     id = id,
     monitor = monitorId,
-    box = Box.new(x1, y1, x3, y3),
-    base = Vector.new(x2, y2),
+    box = Box.new(x[1], y[1], x[3], y[3]),
+    base = Vector.new(x[2], y[2]),
     links = links,
     latestWindow = nil,
     scaler = Box.new(
@@ -277,10 +275,45 @@ function Frame:tostring()
   return "Frame(" .. self.id .. ", box=" .. tostring(self.box) .. ", base=" .. tostring(self.base) .. ")"
 end
 
+-- See keyhac/config.py
+function Frame.panel(h, v, e, p, x, y)
+  local function id(p, x, y)
+    return string.format("%s-%s-%s", p, x, y)
+  end
+
+  local dirs = {}
+
+  if y == 1 then
+    dirs[Direction.top] = e[Direction.top]
+  else
+    dirs[Direction.top] = id(p, x, y - 1)
+  end
+
+  if y == #v then
+    dirs[Direction.bottom] = e[Direction.bottom]
+  else
+    dirs[Direction.bottom] = id(p, x, y + 1)
+  end
+
+  if x == 1 then
+    dirs[Direction.left] = e[Direction.left]
+  else
+    dirs[Direction.left] = id(p, x - 1, y)
+  end
+
+  if x == #h then
+    dirs[Direction.right] = e[Direction.right]
+  else
+    dirs[Direction.right] = id(p, x + 1, y)
+  end
+
+  return Frame.new(id(p, x, y), p, h[x], v[y], dirs)
+end
+
 function Frame.test()
   local m = Monitor.new(1, Box.new(0, 0, 100, 100))
-  local a = Frame.new("a", m.id, 0, 0.25, 0.5, 0, 0.5, 1, {})
-  local b = Frame.new("b", m.id, 0.5, 0.75, 1, 0, 0.5, 1, {})
+  local a = Frame.new("a", m.id, {0, 0.25, 0.5}, {0, 0.5, 1}, {})
+  local b = Frame.new("b", m.id, {0.5, 0.75, 1}, {0, 0.5, 1}, {})
   local ms = {[m.id] = m}
   a:populate(ms, 6)
   b:populate(ms, 6)
@@ -385,10 +418,10 @@ end
 
 function FrameSet.test()
   local m = Monitor.new(1, Box.new(0, 0, 400, 100))
-  local a = Frame.new("a", m.id, 0,    0.125, 0.25, 0, 0.5, 1, {[Direction.right] = "b"})
-  local b = Frame.new("b", m.id, 0.25, 0.375, 0.5,  0, 0.5, 1, {[Direction.left] = "a", [Direction.right] = "c"})
-  local c = Frame.new("c", m.id, 0.5,  0.625, 0.75, 0, 0.5, 1, {[Direction.left] = "b", [Direction.right] = "d"})
-  local d = Frame.new("d", m.id, 0.75, 0.875, 1,    0, 0.5, 1, {[Direction.left] = "c"})
+  local a = Frame.new("a", m.id, {0,    0.125, 0.25}, {0, 0.5, 1}, {[Direction.right] = "b"})
+  local b = Frame.new("b", m.id, {0.25, 0.375, 0.5},  {0, 0.5, 1}, {[Direction.left] = "a", [Direction.right] = "c"})
+  local c = Frame.new("c", m.id, {0.5,  0.625, 0.75}, {0, 0.5, 1}, {[Direction.left] = "b", [Direction.right] = "d"})
+  local d = Frame.new("d", m.id, {0.75, 0.875, 1},    {0, 0.5, 1}, {[Direction.left] = "c"})
   local ms = {[m.id] = m}
   local fs = FrameSet.new()
   fs:initialize({a, b, c, d})
