@@ -1,7 +1,7 @@
 ﻿import keyhac
-import math
+import pyauto
 from enum import Enum
-from typing import Tuple, List, Set, Dict, Optional, Any
+from typing import Tuple, List, Set, Dict, Optional, Any, Callable
 from functools import cmp_to_key
 
 def configure(keymap: Any) -> None:
@@ -10,7 +10,7 @@ def configure(keymap: Any) -> None:
         box = Box(monitor_info[1])
         ms.register(Monitor(i, box))
 
-    h = [(0, 0.166, 0.333), (0.033, 0.333, 0.633), (0.333, 0.5, 0.666), (0.666, 0.832, 1)]
+    h = [(0, 0.15, 0.3), (0.25, 0.5, 0.75), (0.7, 0.85, 1.0)]
     v = [(0, 0.25, 0.5), (0, 0.5, 1), (0.5, 0.75, 1)]
     main = [Frame.panel(h, v, {Direction.BOTTOM: "0"}, 1, x, y) for x in range(len(h)) for y in range(len(v))]
     sub = [Frame("0", 0, (0, 0.5, 1), (0, 0.5, 1), {Direction.TOP: "1-2-2"})]
@@ -30,7 +30,7 @@ def configure(keymap: Any) -> None:
             return True
 
         # ignore VR related applications
-        if win.getText() == "SteamVR" or win.getText() == "SteamVR ステータス" or win.getText() == "vrmonitor":
+        if win.getText() == "vrmonitor":
             return True
         # ignore explorer.exe
         if win.getClassName() == "Progman":
@@ -60,7 +60,14 @@ def configure(keymap: Any) -> None:
 
     bind["U0-C-R"] = keymap.command_ReloadConfig
 
-    bind["U0-Return"] = keymap.ShellExecuteCommand(None, "wt.exe", "", "")
+    bind["U0-S-D"] = Operation.dump_windows
+
+    bind["U0-Return"] = lambda: Operation.focus_by_application(fs, "WindowsTerminal.exe", "wt.exe")
+    bind["U0-B"] = lambda: Operation.focus_by_application(fs, "firefox.exe")
+    bind["U0-C"] = lambda: Operation.focus_by_application(fs, "slack.exe")
+    bind["U0-V"] = lambda: Operation.focus_by_application(fs, "Code.exe")
+    bind["U0-N"] = lambda: Operation.focus_by_application(fs, "Obsidian.exe")
+
     bind["U0-S-C"] = Operation.close_window
 
     bind["U0-M"] = Operation.toggle_maximize_window
@@ -80,10 +87,10 @@ def configure(keymap: Any) -> None:
 
     bind["U0-S-I"] = lambda: Operation.reset_window_size(fs)
 
-    bind["U0-S-K"] = lambda: Operation.resize_window_by_direction(fs, Direction.TOP, 125)
-    bind["U0-S-J"] = lambda: Operation.resize_window_by_direction(fs, Direction.BOTTOM, 125)
-    bind["U0-S-H"] = lambda: Operation.resize_window_by_direction(fs, Direction.LEFT, 125)
-    bind["U0-S-L"] = lambda: Operation.resize_window_by_direction(fs, Direction.RIGHT, 125)
+    bind["U0-S-K"] = lambda: Operation.resize_window_by_direction(fs, Direction.TOP, 0.05)
+    bind["U0-S-J"] = lambda: Operation.resize_window_by_direction(fs, Direction.BOTTOM, 0.05)
+    bind["U0-S-H"] = lambda: Operation.resize_window_by_direction(fs, Direction.LEFT, 0.05)
+    bind["U0-S-L"] = lambda: Operation.resize_window_by_direction(fs, Direction.RIGHT, 0.05)
 
     Operation.reactivate_binds()
 
@@ -119,6 +126,14 @@ class Box:
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Box) and self.min == other.min and self.max == other.max
+
+    def __mul__(self, s: Vector) -> "Box":
+        return Box((
+            self.min.x * s.x,
+            self.min.y * s.y,
+            self.max.x * s.x,
+            self.max.y * s.y,
+        ))
 
     def size(self) -> Vector:
         return self.max - self.min
@@ -215,10 +230,10 @@ class Frame:
         l = 1 if x[0] != 0 else 0
         r = 1 if x[2] != 1 else 0
         self.scaler = Box((
-            -1 if l == r else l,
-            -1 if t == b else t,
-            1 if l == r else r,
-            1 if t == b else b,
+            -0.5 if l == r else l,
+            -0.5 if t == b else t,
+            0.5 if l == r else r,
+            0.5 if t == b else b,
         ))
 
     def __eq__(self, other: object) -> bool:
@@ -238,6 +253,7 @@ class Frame:
         self.box.min = map_with_offset(self.box.min, padding)
         self.box.max = map_with_offset(self.box.max, -padding)
         self.base = monitor.map(self.base)
+        self.scaler = self.scaler * monitor.box.size()
         return True
 
     def __str__(self) -> str:
@@ -248,7 +264,7 @@ class Frame:
               h: List[Tuple[float, float, float]],
               v: List[Tuple[float, float, float]],
               e: Dict[Direction, FrameId],
-              p: int,
+              monitor: int,
               x: int,
               y: int) -> "Frame":
         dirs = {}
@@ -256,24 +272,24 @@ class Frame:
         if y == 0:
             if Direction.TOP in e: dirs[Direction.TOP] = e[Direction.TOP]
         else:
-            dirs[Direction.TOP] = f"{p}-{x}-{y-1}"
+            dirs[Direction.TOP] = f"{monitor}-{x}-{y-1}"
 
         if y == len(v) - 1:
             if Direction.BOTTOM in e: dirs[Direction.BOTTOM] = e[Direction.BOTTOM]
         else:
-            dirs[Direction.BOTTOM] = f"{p}-{x}-{y+1}"
+            dirs[Direction.BOTTOM] = f"{monitor}-{x}-{y+1}"
 
         if x == 0:
             if Direction.LEFT in e: dirs[Direction.LEFT] = e[Direction.LEFT]
         else:
-            dirs[Direction.LEFT] = f"{p}-{x-1}-{y}"
+            dirs[Direction.LEFT] = f"{monitor}-{x-1}-{y}"
 
         if x == len(h) - 1:
             if Direction.RIGHT in e: dirs[Direction.RIGHT] = e[Direction.RIGHT]
         else:
-            dirs[Direction.RIGHT] = f"{p}-{x+1}-{y}"
+            dirs[Direction.RIGHT] = f"{monitor}-{x+1}-{y}"
 
-        return c(f"{p}-{x}-{y}", p, h[x], v[y], dirs)
+        return c(f"{monitor}-{x}-{y}", monitor, h[x], v[y], dirs)
 
 
 class FrameSet:
@@ -291,6 +307,13 @@ class FrameSet:
 
     def get_by_direction(self, base: Frame, dir: Direction) -> Optional[Frame]:
         return self.items[base.links[dir]] if dir in base.links else None
+
+    def get_by_window(self, win: Any, save_latest: bool = True) -> Frame:
+        box = Box(win.getRect())
+        frame = self.get_nearest(box.center())
+        if save_latest:
+            frame.latest_window = win.getHWND()
+        return frame
 
     def enumerate_by_direction(self, base: Frame, dir: Direction) -> List[Frame]:
         todo = [self.get_by_direction(base, dir)]
@@ -336,15 +359,19 @@ class Operation:
     is_ignored_window: Any = None
 
     @classmethod
-    def get_windows(c) -> List[Any]:
+    def get_windows(c, cond: Optional[Callable[[Any], bool]] = None) -> List[Any]:
         ret = []
 
         def f(win, _):
-            if not c.is_ignored_window(win):
-                ret.append(win)
+            if c.is_ignored_window(win):
+                return True
+            if cond and not cond(win):
+                return True
+            ret.append(win)
             return True
 
         keyhac.Window.enum(f, None)
+        ret.sort(key=cmp_to_key(lambda a, b: a.getHWND() - b.getHWND()))
         return ret
 
     @classmethod
@@ -353,9 +380,7 @@ class Operation:
             box = Box(win.getRect())
             f = fs.get_nearest(box.center())
             return frame == f
-        ret = [w for w in c.get_windows() if is_in_frame(w)]
-        ret.sort(key=cmp_to_key(lambda a, b: a.getHWND() - b.getHWND()))
-        return ret
+        return c.get_windows(is_in_frame)
 
     @classmethod
     def get_current_window(c) -> Any:
@@ -388,9 +413,7 @@ class Operation:
     @classmethod
     def focus_some_window(c, fs: FrameSet) -> bool:
         for win in c.get_windows():
-            box = Box(win.getRect())
-            base = fs.get_nearest(box.center())
-            base.latest_window = win.getHWND()
+            fs.get_by_window(win)
             win.setForeground()
             return True
         return False
@@ -401,46 +424,58 @@ class Operation:
             win = c.get_current_window()
             if not win:
                 return c.focus_some_window(fs)
-            box = Box(win.getRect())
-            base = fs.get_nearest(box.center())
+            base = fs.get_by_window(win)
 
-        base.latest_window = win.getHWND()
         for next_frame in fs.enumerate_by_direction(base, dir):
             if c.focus_window_in_frame(fs, 0, next_frame):
                 return True
         return False
 
     @classmethod
+    def focus_by_application(c, fs: FrameSet, process_name: str, open_path: Optional[str] = None) -> bool:
+        wins = c.get_windows(lambda win: win.getProcessName() == process_name)
+
+        if not wins:
+            pyauto.shellExecute("open", open_path or process_name)
+            return True
+
+        return c.focus_window_in_rotation(fs, wins, 1)
+
+    @classmethod
     def focus_window_in_frame(c, fs: FrameSet, offset: int, base: Optional[Frame] = None) -> bool:
-        win = c.get_current_window()
         if not base:
+            win = c.get_current_window()
             if not win:
                 return c.focus_some_window(fs)
-            box = Box(win.getRect())
-            base = fs.get_nearest(box.center())
+            base = fs.get_by_window(win)
 
         wins = c.get_windows_in_frame(fs, base)
         if not wins:
             return False
 
-        current: Optional[int] = None
+        return c.focus_window_in_rotation(fs, wins, offset, base.latest_window)
+
+    @classmethod
+    def focus_window_in_rotation(c, fs: FrameSet, wins: List[Any], offset: int, latest: Optional[int] = None) -> bool:
+        index: Optional[int] = None
+        current = c.get_current_window()
         for i, w in enumerate(wins):
-            if w == win:
-                current = i
+            if w == current:
+                index = i
                 break
 
-        if current is None and base.latest_window is not None:
+        if index is None and latest:
             for i, w in enumerate(wins):
-                if w.getHWND() == base.latest_window:
-                    current = i
+                if w.getHWND() == latest:
+                    index = i
                     break
 
-        if current is None:
-            current = 0
+        if index is None:
+            index = 0
 
-        next_win = wins[(current + offset) % len(wins)]
-        base.latest_window = next_win.getHWND()
+        next_win = wins[(index + offset) % len(wins)]
         next_win.setForeground()
+        fs.get_by_window(next_win)
         return True
 
     @classmethod
@@ -448,14 +483,12 @@ class Operation:
         win = c.get_current_window()
         if not win:
             return
-        box = Box(win.getRect())
-        frame = fs.get_nearest(box.center())
+        frame = fs.get_by_window(win)
         next_frame = fs.get_by_direction(frame, dir)
         if next_frame:
-            next_frame.latest_window = win.getHWND()
             win.setRect(next_frame.box.rect())
+            fs.get_by_window(win)
         else:
-            frame.latest_window = win.getHWND()
             win.setRect(frame.box.rect())
 
     @classmethod
@@ -463,9 +496,7 @@ class Operation:
         win = c.get_current_window()
         if not win:
             return
-        box = Box(win.getRect())
-        frame = fs.get_nearest(box.center())
-        frame.latest_window = win.getHWND()
+        frame = fs.get_by_window(win)
         win.setRect(frame.box.rect())
 
     @classmethod
@@ -474,10 +505,17 @@ class Operation:
         if not win:
             return
         box = Box(win.getRect())
-        frame = fs.get_nearest(box.center())
-        frame.latest_window = win.getHWND()
+        frame = fs.get_by_window(win)
         box.min.x = box.min.x + dir.vector().x * frame.scaler.min.x * l
         box.min.y = box.min.y + dir.vector().y * frame.scaler.min.y * l
         box.max.x = box.max.x + dir.vector().x * frame.scaler.max.x * l
         box.max.y = box.max.y + dir.vector().y * frame.scaler.max.y * l
         win.setRect(box.rect())
+
+    @classmethod
+    def dump_windows(c) -> None:
+        wins = c.get_windows()
+        for w in wins:
+            print(f"{w.getText()}:")
+            print(f"  className = {w.getClassName()}")
+            print(f"  processName = {w.getProcessName()}")
