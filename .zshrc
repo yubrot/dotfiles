@@ -14,20 +14,19 @@ use_exa_as_ls() {
 case "${OSTYPE}" in
 darwin*)
   alias cp='cp -apR'
-  alias scp='scp -r'
   use_exa_as_ls
   export EDITOR=/opt/homebrew/bin/nvim
   export PATH=/opt/homebrew/bin:$PATH
   ;;
 linux*)
   alias cp='cp -apr'
-  alias scp='scp -r'
   use_exa_as_ls
   export EDITOR=/usr/bin/nvim
   export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
   ;;
 esac
 
+alias scp='scp -r'
 alias c='cd ..'
 alias cdr='cdroot'
 alias v='nvim'
@@ -54,21 +53,9 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 # OCaml
 . $HOME/.opam/opam-init/init.zsh >/dev/null 2>&1 || true
 
-# Haskell
-[ -f "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env" ] && source "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env"
-
-# LLVM
-export LLVMENV_RUST_BINDING=1
-command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
-
-# Go
-export GO111MODULE=on
-export GOROOT=/usr/lib/go
-export GOPATH=$HOME/.go
-export PATH=$GOPATH/bin:$PATH
-
 # Rust
 export PATH=$HOME/.cargo/bin:$PATH
+export LLVMENV_RUST_BINDING=1
 
 # Node
 export PATH=$HOME/.nodebrew/current/bin:$PATH
@@ -81,14 +68,6 @@ alias dot='TERM=xterm dotnet'
 
 # Java
 export PATH="$HOME/.jenv/bin:$PATH"
-command -v jenv >/dev/null 2>&1 && eval "$(jenv init -)"
-alias j!=jbang
-export PATH="$HOME/.jbang/bin:$PATH"
-
-# Scala
-alias sbt='TERM=xterm sbt'
-export PATH=$HOME/Library/Application\ Support/Coursier/bin:$PATH
-export PATH=$HOME/.local/share/coursier/bin:$PATH
 
 # Docker
 alias d='docker'
@@ -102,6 +81,8 @@ dclean() {
   d volume rm `d volume ls -f dangling=true -q`
   d rmi `d images -f dangling=true -q`
 }
+
+# Kubernetes
 alias k='kubectl'
 alias kr='k run --rm -it --restart=Never'
 alias kex='k exec -it'
@@ -154,6 +135,11 @@ ZSH_AUTOSUGGEST_USE_ASYNC=true
 _zsh_autosuggest_capture_postcompletion() {
   unset 'compstate[list]'
 }
+
+[ -f "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env" ] && source "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env"
+command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
+command -v goenv >/dev/null 2>&1 && eval "$(goenv init -)"
+command -v jenv >/dev/null 2>&1 && eval "$(jenv init -)"
 
 eval "$(starship init zsh)"
 eval "$(direnv hook zsh)"
