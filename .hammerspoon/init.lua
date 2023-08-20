@@ -13,15 +13,15 @@ function init()
     ms[i] = Monitor.new(i, Box.fromRect(screen:frame()))
   end
 
-  local h = {{0, 0.166, 0.333}, {0.033, 0.333, 0.633}, {0.333, 0.5, 0.666}, {0.666, 0.832, 1}}
+  local h = {{0, 0.15, 0.3}, {0.25, 0.5, 0.75}, {0.7, 0.85, 1}}
   local v = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}}
   local frames = {}
   for x = 1, #h do
     for y = 1, #v do
-      table.insert(frames, Frame.panel(h, v, {[Direction.right] = "2"}, 1, x, y))
+      table.insert(frames, Frame.panel(h, v, {[Direction.bottom] = "2"}, 1, x, y))
     end
   end
-  table.insert(frames, Frame.new("2", 2, {0, 0.5, 1}, {0, 0.5, 1}, {[Direction.left] = "1-4-2"}))
+  table.insert(frames, Frame.new("2", 2, {0, 0.5, 1}, {0, 0.5, 1}, {[Direction.top] = "1-2-2"}))
   local fs = FrameSet.new()
   fs:initialize(frames)
   fs:populate(ms, 0)
@@ -31,7 +31,12 @@ function init()
 
   hs.hotkey.bind({"alt", "ctrl"}, "r", hs.reload)
 
-  hs.hotkey.bind({"alt"}, "return", function() hs.applescript.applescript([[do shell script "/usr/bin/open -a WezTerm"]]) end)
+  hs.hotkey.bind({"alt"}, "return", function() operation.focusByApplication(fs, "WezTerm") end)
+  hs.hotkey.bind({"alt"}, "b", function() operation.focusByApplication(fs, "Firefox") end)
+  hs.hotkey.bind({"alt"}, "c", function() operation.focusByApplication(fs, "Slack") end)
+  hs.hotkey.bind({"alt"}, "v", function() operation.focusByApplication(fs, "Visual Studio Code") end)
+  hs.hotkey.bind({"alt"}, "n", function() operation.focusByApplication(fs, "Obsidian") end)
+
   hs.hotkey.bind({"alt", "shift"}, "c", operation.closeWindow)
 
   hs.hotkey.bind({"alt"}, "m", operation.toggleMaximizeWindow)
@@ -51,10 +56,10 @@ function init()
 
   hs.hotkey.bind({"alt", "shift"}, "i", function() operation.resetWindowSize(fs) end)
 
-  hs.hotkey.bind({"alt", "shift"}, "k", function() operation.resizeWindowByDirection(fs, Direction.top, 125) end)
-  hs.hotkey.bind({"alt", "shift"}, "j", function() operation.resizeWindowByDirection(fs, Direction.bottom, 125) end)
-  hs.hotkey.bind({"alt", "shift"}, "h", function() operation.resizeWindowByDirection(fs, Direction.left, 125) end)
-  hs.hotkey.bind({"alt", "shift"}, "l", function() operation.resizeWindowByDirection(fs, Direction.right, 125) end)
+  hs.hotkey.bind({"alt", "shift"}, "k", function() operation.resizeWindowByDirection(fs, Direction.top, 0.1) end)
+  hs.hotkey.bind({"alt", "shift"}, "j", function() operation.resizeWindowByDirection(fs, Direction.bottom, 0.1) end)
+  hs.hotkey.bind({"alt", "shift"}, "h", function() operation.resizeWindowByDirection(fs, Direction.left, 0.1) end)
+  hs.hotkey.bind({"alt", "shift"}, "l", function() operation.resizeWindowByDirection(fs, Direction.right, 0.1) end)
 end
 
 Vector = {}
@@ -126,6 +131,15 @@ function Box:eq(other)
   return self.min == other.min and self.max == other.max
 end
 
+function Box:mul(other)
+  return Box.new(
+    self.min.x * other.x,
+    self.min.y * other.y,
+    self.max.x * other.x,
+    self.max.y * other.y
+  )
+end
+
 function Box:size()
   return self.max - self.min
 end
@@ -147,12 +161,14 @@ function Box.test()
   assert(Box.new(5, 10, 15, 25) ~= Box.new(5, 10, 15, 30))
   assert(tostring(Box.new(5, 10, 15, 25)) == "(5, 10 .. 15, 25)")
   assert(Box.new(5, 10, 15, 25):size() == Vector.new(10, 15))
+  assert(Box.new(-1, -2, 3, 4) * Vector.new(2, 3) == Box.new(-2, -6, 6, 12))
   assert(Box.new(5, 10, 15, 30):center() == Vector.new(10, 20))
 end
 
 Box.mt = {
   __index = Box,
   __eq = Box.eq,
+  __mul = Box.mul,
   __tostring = Box.tostring,
 }
 
@@ -245,10 +261,10 @@ function Frame.new(id, monitorId, x, y, links)
     links = links,
     latestWindow = nil,
     scaler = Box.new(
-      l == r and -1 or l,
-      t == b and -1 or t,
-      l == r and 1 or r,
-      t == b and 1 or b),
+      l == r and -0.5 or l,
+      t == b and -0.5 or t,
+      l == r and 0.5 or r,
+      t == b and 0.5 or b),
   }, Frame.mt)
 end
 
@@ -268,6 +284,7 @@ function Frame:populate(ms, padding)
   self.box.min = mapWithOffset(self.box.min, padding)
   self.box.max = mapWithOffset(self.box.max, -padding)
   self.base = monitor:map(self.base)
+  self.scaler = self.scaler * monitor.box:size()
   return true
 end
 
@@ -276,9 +293,9 @@ function Frame:tostring()
 end
 
 -- See keyhac/config.py
-function Frame.panel(h, v, e, p, x, y)
-  local function id(p, x, y)
-    return string.format("%s-%s-%s", p, x, y)
+function Frame.panel(h, v, e, monitor, x, y)
+  local function id(x, y)
+    return string.format("%s-%s-%s", monitor, x, y)
   end
 
   local dirs = {}
@@ -286,28 +303,28 @@ function Frame.panel(h, v, e, p, x, y)
   if y == 1 then
     dirs[Direction.top] = e[Direction.top]
   else
-    dirs[Direction.top] = id(p, x, y - 1)
+    dirs[Direction.top] = id(x, y - 1)
   end
 
   if y == #v then
     dirs[Direction.bottom] = e[Direction.bottom]
   else
-    dirs[Direction.bottom] = id(p, x, y + 1)
+    dirs[Direction.bottom] = id(x, y + 1)
   end
 
   if x == 1 then
     dirs[Direction.left] = e[Direction.left]
   else
-    dirs[Direction.left] = id(p, x - 1, y)
+    dirs[Direction.left] = id(x - 1, y)
   end
 
   if x == #h then
     dirs[Direction.right] = e[Direction.right]
   else
-    dirs[Direction.right] = id(p, x + 1, y)
+    dirs[Direction.right] = id(x + 1, y)
   end
 
-  return Frame.new(id(p, x, y), p, h[x], v[y], dirs)
+  return Frame.new(id(x, y), monitor, h[x], v[y], dirs)
 end
 
 function Frame.test()
@@ -319,10 +336,10 @@ function Frame.test()
   b:populate(ms, 6)
   assert(a.box == Box.new(6, 6, 47, 94))
   assert(a.base == Vector.new(25, 50))
-  assert(a.scaler == Box.new(0, -1, 1, 1))
+  assert(a.scaler == Box.new(0, -50, 100, 50))
   assert(b.box == Box.new(53, 6, 94, 94))
   assert(b.base == Vector.new(75, 50))
-  assert(b.scaler == Box.new(1, -1, 0, 1))
+  assert(b.scaler == Box.new(100, -50, 0, 50))
 end
 
 Frame.mt = {
@@ -360,6 +377,15 @@ end
 function FrameSet:getByDirection(baseFrame, dir)
   local frameId = baseFrame.links[dir]
   return frameId and self.items[frameId] or nil
+end
+
+function FrameSet:getByWindow(win, saveLatest)
+  local box = Box.fromRect(win:frame())
+  local frame = self:getNearest(box:center())
+  if saveLatest or saveLatest == nil then
+    frame.latestWindow = win:id()
+  end
+  return frame
 end
 
 function FrameSet:enumerateByDirection(baseFrame, dir)
@@ -447,18 +473,20 @@ FrameSet.mt = {__index = FrameSet}
 
 operation = {}
 
-function operation.getWindows()
-  return hs.fnutils.filter(hs.window.visibleWindows(), function(win) return win:isStandard() end)
-end
-
-function operation.getWindowsInFrame(fs, frame)
-  local wins = hs.fnutils.filter(operation.getWindows(), function(win)
-    local box = Box.fromRect(win:frame())
-    local f = fs:getNearest(box:center())
-    return f == frame
+function operation.getWindows(cond)
+  local wins = hs.fnutils.filter(hs.window.visibleWindows(), function(win)
+    return win:isStandard() and (not cond or cond(win))
   end)
   table.sort(wins, function(a, b) return a:id() < b:id() end)
   return wins
+end
+
+function operation.getWindowsInFrame(fs, frame)
+  return operation.getWindows(function(win)
+    local box = Box.fromRect(win:frame())
+    local f = fs:getNearest(box:center())
+    return frame == f
+  end)
 end
 
 function operation.getCurrentWindow()
@@ -502,27 +530,22 @@ end
 
 function operation.focusSomeWindow(fs)
   for _, win in pairs(operation.getWindows()) do
-    local box = Box.fromRect(win:frame())
-    local baseFrame = fs:getNearest(box:center())
-    baseFrame.latestWindow = win:id()
     win:focus()
+    operation.alertWindows(operation.getWindowsInFrame(fs, fs:getByWindow(win)))
     return true
   end
   return false
 end
 
 function operation.focusFrameByDirection(fs, dir, baseFrame)
-  local win
   if not baseFrame then
-    win = operation.getCurrentWindow()
+    local win = operation.getCurrentWindow()
     if not win then
       return operation.focusSomeWindow(fs)
     end
-    local box = Box.fromRect(win:frame())
-    baseFrame = fs:getNearest(box:center())
+    baseFrame = fs:getByWindow(win)
   end
 
-  baseFrame.latestWindow = win:id()
   for _, nextFrame in ipairs(fs:enumerateByDirection(baseFrame, dir)) do
     if operation.focusWindowInFrame(fs, 0, nextFrame) then
       return true
@@ -531,14 +554,26 @@ function operation.focusFrameByDirection(fs, dir, baseFrame)
   return false
 end
 
+function operation.focusByApplication(fs, app)
+  local wins = operation.getWindows(function(win)
+    return win:application():path():find(app)
+  end)
+
+  if not wins or not next(wins) then
+    hs.applescript.applescript([[do shell script "/usr/bin/open -a ']] .. app .. [['"]])
+    return true
+  end
+
+  return operation.focusWindowInRotation(fs, wins, 1)
+end
+
 function operation.focusWindowInFrame(fs, offset, baseFrame)
-  local win = operation.getCurrentWindow()
   if not baseFrame then
+    local win = operation.getCurrentWindow()
     if not win then
       return operation.focusSomeWindow(fs)
     end
-    local box = Box.fromRect(win:frame())
-    baseFrame = fs:getNearest(box:center())
+    baseFrame = fs:getByWindow(win)
   end
 
   local frameWins = operation.getWindowsInFrame(fs, baseFrame)
@@ -546,30 +581,36 @@ function operation.focusWindowInFrame(fs, offset, baseFrame)
     return false
   end
 
-  local current = nil
-  for i, w in ipairs(frameWins) do
-    if w == win then
-      current = i
+  return operation.focusWindowInRotation(fs, frameWins, offset, baseFrame.latestWindow)
+end
+
+function operation.focusWindowInRotation(fs, wins, offset, latest)
+  local index = nil
+  local current = operation.getCurrentWindow()
+  for i, w in ipairs(wins) do
+    if w == current then
+      index = i
       break
     end
   end
 
-  if not current and baseFrame.latestWindow then
-    for i, w in ipairs(frameWins) do
-      if w:id() == baseFrame.latestWindow then
-        current = i
+  if not index and latest then
+    for i, w in ipairs(wins) do
+      if w:id() == latest then
+        index = i
         break
       end
     end
   end
 
-  if not current then
-    current = 1
+  if not index then
+    index = 1
   end
 
-  local nextWin = frameWins[((#frameWins + current + offset - 1) % #frameWins) + 1]
-  baseFrame.latestWindow = nextWin:id()
+  local nextWin = wins[((#wins + index + offset - 1) % #wins) + 1]
   nextWin:focus()
+  fs:getByWindow(nextWin) -- save latest window
+  operation.alertWindows(wins)
   return true
 end
 
@@ -578,14 +619,12 @@ function operation.moveWindowByDirection(fs, dir)
   if not win then
     return
   end
-  local box = Box.fromRect(win:frame())
-  local frame = fs:getNearest(box:center())
+  local frame = fs:getByWindow(win)
   local nextFrame = fs:getByDirection(frame, dir)
   if nextFrame then
-    nextFrame.latestWindow = win:id()
     win:setFrame(nextFrame.box:rect())
+    operation.alertWindows(operation.getWindowsInFrame(fs, nextFrame))
   else
-    frame.latestWindow = win:id()
     win:setFrame(frame.box:rect())
   end
 end
@@ -595,9 +634,7 @@ function operation.resetWindowSize(fs)
   if not win then
     return
   end
-  local box = Box.fromRect(win:frame())
-  local frame = fs:getNearest(box:center())
-  frame.latestWindow = win:id()
+  local frame = fs:getByWindow(win)
   win:setFrame(frame.box:rect())
 end
 
@@ -607,13 +644,43 @@ function operation.resizeWindowByDirection(fs, dir, l)
     return
   end
   local box = Box.fromRect(win:frame())
-  local frame = fs:getNearest(box:center())
-  frame.latestWindow = win:id()
+  local frame = fs:getByWindow(win)
   box.min.x = box.min.x + dir.vector.x * frame.scaler.min.x * l
   box.min.y = box.min.y + dir.vector.y * frame.scaler.min.y * l
   box.max.x = box.max.x + dir.vector.x * frame.scaler.max.x * l
   box.max.y = box.max.y + dir.vector.y * frame.scaler.max.y * l
   win:setFrame(box:rect())
+end
+
+function operation.alertWindows(wins)
+  local apps = {}
+  for _, win in pairs(wins) do
+    local app = win:application():title()
+    apps[app] = 1 + (apps[app] or 0)
+  end
+
+  local current = operation.getCurrentWindow()
+  local messages = {}
+  for _, win in pairs(wins) do
+    local prefix = win == current and "◆ " or "◇ "
+    local app = win:application():title()
+    local title = 1 < apps[app] and app .. " (" .. utf8.sub(win:title(), 0, 30) .. ")" or app
+    table.insert(messages, prefix .. title)
+  end
+  hs.alert.closeAll()
+  hs.alert.show(table.concat(messages, "\n"), 1)
+end
+
+function utf8.sub(s, i, j)
+  i = utf8.offset(s, i)
+  j = utf8.offset(s, j + 1)
+  if i and j then
+    return s:sub(i, j - 1)
+  elseif i then
+    return s:sub(i)
+  else
+    return ""
+  end
 end
 
 init()
