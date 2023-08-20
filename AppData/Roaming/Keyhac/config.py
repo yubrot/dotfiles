@@ -48,6 +48,7 @@ def configure(keymap: Any) -> None:
 
     Operation.is_ignored_window = is_ignored_window
     Operation.get_top_level_window = keymap.getTopLevelWindow
+    Operation.pop_balloon = keymap.popBalloon
 
     keymap.clipboard_history.maxnum = 1
 
@@ -59,8 +60,6 @@ def configure(keymap: Any) -> None:
     bind["BACKSLASH"] = keymap.InputKeyCommand("S-UNDERSCORE")
 
     bind["U0-C-R"] = keymap.command_ReloadConfig
-
-    bind["U0-S-D"] = Operation.dump_windows
 
     bind["U0-Return"] = lambda: Operation.focus_by_application(fs, "WindowsTerminal.exe", "wt.exe")
     bind["U0-B"] = lambda: Operation.focus_by_application(fs, "firefox.exe")
@@ -87,10 +86,10 @@ def configure(keymap: Any) -> None:
 
     bind["U0-S-I"] = lambda: Operation.reset_window_size(fs)
 
-    bind["U0-S-K"] = lambda: Operation.resize_window_by_direction(fs, Direction.TOP, 0.05)
-    bind["U0-S-J"] = lambda: Operation.resize_window_by_direction(fs, Direction.BOTTOM, 0.05)
-    bind["U0-S-H"] = lambda: Operation.resize_window_by_direction(fs, Direction.LEFT, 0.05)
-    bind["U0-S-L"] = lambda: Operation.resize_window_by_direction(fs, Direction.RIGHT, 0.05)
+    bind["U0-S-K"] = lambda: Operation.resize_window_by_direction(fs, Direction.TOP, 0.1)
+    bind["U0-S-J"] = lambda: Operation.resize_window_by_direction(fs, Direction.BOTTOM, 0.1)
+    bind["U0-S-H"] = lambda: Operation.resize_window_by_direction(fs, Direction.LEFT, 0.1)
+    bind["U0-S-L"] = lambda: Operation.resize_window_by_direction(fs, Direction.RIGHT, 0.1)
 
     Operation.reactivate_binds()
 
@@ -356,6 +355,8 @@ class FrameSet:
 class Operation:
     get_top_level_window: Any = None
 
+    pop_balloon: Any = None
+
     is_ignored_window: Any = None
 
     @classmethod
@@ -415,6 +416,7 @@ class Operation:
         for win in c.get_windows():
             fs.get_by_window(win)
             win.setForeground()
+            c.alert_windows(c.get_windows_in_frame(fs, fs.get_by_window(win)), win)
             return True
         return False
 
@@ -475,7 +477,8 @@ class Operation:
 
         next_win = wins[(index + offset) % len(wins)]
         next_win.setForeground()
-        fs.get_by_window(next_win)
+        fs.get_by_window(next_win) # save the latest window
+        c.alert_windows(wins, next_win)
         return True
 
     @classmethod
@@ -487,7 +490,7 @@ class Operation:
         next_frame = fs.get_by_direction(frame, dir)
         if next_frame:
             win.setRect(next_frame.box.rect())
-            fs.get_by_window(win)
+            c.alert_windows(c.get_windows_in_frame(fs, next_frame), win)
         else:
             win.setRect(frame.box.rect())
 
@@ -513,9 +516,23 @@ class Operation:
         win.setRect(box.rect())
 
     @classmethod
-    def dump_windows(c) -> None:
-        wins = c.get_windows()
-        for w in wins:
-            print(f"{w.getText()}:")
-            print(f"  className = {w.getClassName()}")
-            print(f"  processName = {w.getProcessName()}")
+    def alert_windows(c, wins: List[Any], current: Any) -> None:
+        apps: Dict[str, int] = {}
+        for win in wins:
+            app = win.getProcessName()
+            apps[app] = 1 + apps.get(app, 0)
+
+        # We can't do this since win.setForeground() does not affect here immediately
+        # current = c.get_current_window()
+        messages: List[str] = []
+        for win in wins:
+            prefix = "◆" if win == current else "◇"
+            app = win.getProcessName()
+            title = f"{app} ({win.getText()[:30]})" if 1 < apps[app] else app
+            messages.append(f"{prefix} {title}")
+
+        try:
+            c.pop_balloon("alert_windows", "\n".join(messages), 1000)
+        except AttributeError:
+            # TODO: Why this happens?
+            pass
