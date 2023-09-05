@@ -140,6 +140,7 @@ _zsh_autosuggest_capture_postcompletion() {
 command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
 command -v goenv >/dev/null 2>&1 && eval "$(goenv init -)"
 command -v jenv >/dev/null 2>&1 && eval "$(jenv init -)"
+command -v rbenv >/dev/null 2>&1 && eval "$(rbenv init - zsh)"
 
 eval "$(starship init zsh)"
 eval "$(direnv hook zsh)"
