@@ -4,9 +4,10 @@ export EDITOR='/c/Program Files/Neovim/bin/nvim.exe'
 
 alias cp='cp -apr'
 alias scp='scp -r'
-alias ls='ls -F --color=auto --group-directories-first'
-alias la='ls -A'
-alias s='ls -I "*.meta" -I "ntuser.*" -I "NTUSER.*" -I "Application Data" -I Contacts -I "3D Objects" -I Favorites -I "Local Settings" -I OneDrive -I PrintHood -I "Saved Games" -I Cookies -I Links -I NetHood -I Recent -I Searches -I SendTo -I Templates -I Tracing -I "My Documents" -I Videos -I "スタート メニュー" -I "\$Recycle.Bin"'
+
+alias ls='eza -F --group-directories-first'
+alias la='ls -a'
+alias s='ls --git-ignore -I "*.meta|ntuser.*|NTUSER.*|ansel|Application Data|Contacts|3D Objects|Favorites|Local Settings|OneDrive|PrintHood|Saved Games|Cookies|Links|NetHood|Recent|Searches|SendTo|Templates|Tracing|My Documents|Videos|スタート メニュー|\$Recycle.Bin|MicrosoftEdgeBackups"'
 alias lss='ls -lh'
 alias c='cd ..'
 alias cdr='cdroot'

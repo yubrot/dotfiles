@@ -12,10 +12,11 @@ def configure(keymap: Any) -> None:
 
     h = [(0, 0.15, 0.3), (0.25, 0.5, 0.75), (0.7, 0.85, 1.0)]
     v = [(0, 0.25, 0.5), (0, 0.5, 1), (0.5, 0.75, 1)]
-    main = [Frame.panel(h, v, {Direction.BOTTOM: "0"}, 1, x, y) for x in range(len(h)) for y in range(len(v))]
-    sub = [Frame("0", 0, (0, 0.5, 1), (0, 0.5, 1), {Direction.TOP: "1-2-2"})]
+    main = [Frame.panel(h, v, {}, 0, x, y) for x in range(len(h)) for y in range(len(v))]
+    # main = [Frame.panel(h, v, {Direction.BOTTOM: "0"}, 1, x, y) for x in range(len(h)) for y in range(len(v))]
+    # sub = [Frame("0", 0, (0, 0.5, 1), (0, 0.5, 1), {Direction.TOP: "1-2-2"})]
     fs = FrameSet()
-    fs.initialize(*main, *sub)
+    fs.initialize(*main)
     fs.populate(ms, 0)
 
     def is_ignored_window(win: Any) -> bool:
@@ -31,6 +32,9 @@ def configure(keymap: Any) -> None:
 
         # ignore VR related applications
         if win.getText() == "vrmonitor":
+            return True
+        # ignore LogiOverlay.exe
+        if win.getProcessName() == "LogiOverlay.exe":
             return True
         # ignore explorer.exe
         if win.getClassName() == "Progman":

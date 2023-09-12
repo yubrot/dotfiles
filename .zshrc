@@ -5,22 +5,14 @@ SAVEHIST=1000000
 bindkey -e
 zstyle :compinstall filename '~/.zshrc'
 
-use_exa_as_ls() {
-  alias ls='exa -F --group-directories-first'
-  alias la='ls -a'
-  alias s='ls --git-ignore -I "*.meta"'
-}
-
 case "${OSTYPE}" in
 darwin*)
   alias cp='cp -apR'
-  use_exa_as_ls
   export EDITOR=/opt/homebrew/bin/nvim
   export PATH=/opt/homebrew/bin:$PATH
   ;;
 linux*)
   alias cp='cp -apr'
-  use_exa_as_ls
   export EDITOR=/usr/bin/nvim
   export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
   ;;
@@ -29,6 +21,9 @@ esac
 alias scp='scp -r'
 alias c='cd ..'
 alias cdr='cdroot'
+alias ls='eza -F --group-directories-first'
+alias la='ls -a'
+alias s='ls --git-ignore -I "*.meta"'
 alias v='nvim'
 alias g='git'
 alias lss='ls -lh'
