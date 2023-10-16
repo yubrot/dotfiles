@@ -52,9 +52,6 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 export PATH=$HOME/.cargo/bin:$PATH
 export LLVMENV_RUST_BINDING=1
 
-# Node
-export PATH=$HOME/.nodebrew/current/bin:$PATH
-
 # .NET
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
 export DOTNET_CLI_UI_LANGUAGE=en-us
@@ -136,6 +133,7 @@ command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
 command -v goenv >/dev/null 2>&1 && eval "$(goenv init -)"
 command -v jenv >/dev/null 2>&1 && eval "$(jenv init -)"
 command -v rbenv >/dev/null 2>&1 && eval "$(rbenv init - zsh)"
+command -v nodenv >/dev/null 2>&1 && eval "$(nodenv init -)"
 
 eval "$(starship init zsh)"
 eval "$(direnv hook zsh)"
