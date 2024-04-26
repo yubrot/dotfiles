@@ -45,6 +45,10 @@ fignore=(.o .obj .bak .hi .deps .meta .asset .mdb .sln .unity)
 export PATH=$HOME/.local/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
+# Deno
+export DENO_INSTALL=$HOME/.deno
+export PATH=$DENO_INSTALL/bin:$PATH
+
 # OCaml
 . $HOME/.opam/opam-init/init.zsh >/dev/null 2>&1 || true
 
