@@ -11,7 +11,7 @@ require("packer").startup(function(use)
   use { "kylechui/nvim-surround", tag = "*" }
   use { "nvim-lualine/lualine.nvim", requires = "nvim-tree/nvim-web-devicons" }
   use { "akinsho/bufferline.nvim", tag = "v3.*", requires = "nvim-tree/nvim-web-devicons" }
-  use { "nvim-telescope/telescope.nvim", tag = "0.1.1", requires = "nvim-lua/plenary.nvim" }
+  use { "nvim-telescope/telescope.nvim", requires = "nvim-lua/plenary.nvim" }
 end)
 
 -- UI
