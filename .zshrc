@@ -9,7 +9,6 @@ case "${OSTYPE}" in
 darwin*)
   alias cp='cp -apR'
   export EDITOR=/opt/homebrew/bin/nvim
-  export PATH=/opt/homebrew/bin:$PATH
   ;;
 linux*)
   alias cp='cp -apr'
@@ -30,7 +29,6 @@ alias lss='ls -lh'
 alias mkdir='mkdir -p'
 alias zip='zip -r'
 alias -g G=' | grep'
-
 
 chpwd() {
   s
@@ -136,6 +134,7 @@ _zsh_autosuggest_capture_postcompletion() {
   unset 'compstate[list]'
 }
 
+command -v /opt/homebrew/bin/brew >/dev/null 2>&1 && eval "$(/opt/homebrew/bin/brew shellenv)"
 [ -f "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env" ] && source "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env"
 command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
 command -v goenv >/dev/null 2>&1 && eval "$(goenv init -)"
