@@ -28,6 +28,7 @@
 [alias]
   s = status --short --branch
   a = add
+  b = branch
   c = commit
   co = checkout
   ps = push -u

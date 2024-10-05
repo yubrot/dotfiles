@@ -11,7 +11,7 @@ require("packer").startup(function(use)
   use "monaqa/dial.nvim"
   use { "kylechui/nvim-surround", tag = "*" }
   use { "nvim-lualine/lualine.nvim", requires = "nvim-tree/nvim-web-devicons" }
-  use { "akinsho/bufferline.nvim", tag = "v4.*", requires = "nvim-tree/nvim-web-devicons" }
+  use { "willothy/nvim-cokeline", requires = "nvim-tree/nvim-web-devicons" }
   use { "nvim-telescope/telescope.nvim", requires = "nvim-lua/plenary.nvim" }
   use { "sustech-data/wildfire.nvim", requires = "nvim-treesitter/nvim-treesitter" }
 end)
@@ -28,7 +28,7 @@ if not vim.g.vscode then
   vim.opt.termguicolors = true
   vim.cmd("colorscheme duskfox")
   require("lualine").setup()
-  require("bufferline").setup()
+  require("cokeline").setup()
 end
 
 -- Behavior
