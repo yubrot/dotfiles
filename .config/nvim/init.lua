@@ -8,10 +8,12 @@ require("packer").startup(function(use)
   use "wbthomason/packer.nvim"
   use "EdenEast/nightfox.nvim"
   use "gbprod/substitute.nvim"
+  use "monaqa/dial.nvim"
   use { "kylechui/nvim-surround", tag = "*" }
   use { "nvim-lualine/lualine.nvim", requires = "nvim-tree/nvim-web-devicons" }
-  use { "akinsho/bufferline.nvim", tag = "v3.*", requires = "nvim-tree/nvim-web-devicons" }
+  use { "akinsho/bufferline.nvim", tag = "v4.*", requires = "nvim-tree/nvim-web-devicons" }
   use { "nvim-telescope/telescope.nvim", requires = "nvim-lua/plenary.nvim" }
+  use { "sustech-data/wildfire.nvim", requires = "nvim-treesitter/nvim-treesitter" }
 end)
 
 -- UI
@@ -41,12 +43,26 @@ vim.opt.shiftround = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.smartindent = true
+local augend = require("dial.augend")
+require("dial.config").augends:register_group{
+  default = {
+    augend.integer.alias.decimal,
+    augend.integer.alias.hex,
+    augend.constant.alias.bool,
+    augend.semver.alias.semver,
+    augend.date.alias["%Y/%m/%d"],
+    augend.date.alias["%Y-%m-%d"],
+  },
+}
 
 -- Keymaps
 require("substitute").setup()
 require("nvim-surround").setup()
+require("wildfire").setup()
 vim.keymap.set({"n", "v"}, "j", "gj", { noremap = true })
 vim.keymap.set({"n", "v"}, "k", "gk", { noremap = true })
+vim.keymap.set("n", "<C-a>", function() require("dial.map").manipulate("increment", "normal") end)
+vim.keymap.set("n", "<C-x>", function() require("dial.map").manipulate("decrement", "normal") end)
 vim.keymap.set("v", "v", "$h", { noremap = true })
 vim.keymap.set({"n", "v"}, "Y", "y$", { noremap = true })
 vim.keymap.set("n", "s", require('substitute').operator)
