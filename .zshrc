@@ -1,9 +1,14 @@
+# -----------------------
+# Core
+# -----------------------
+
 HISTFILE=~/.histfile
 HISTSIZE=1000000
 SAVEHIST=1000000
 
 bindkey -e
-zstyle :compinstall filename '~/.zshrc'
+bindkey '^f' forward-word
+bindkey '^b' backward-word
 
 case "${OSTYPE}" in
 darwin*)
@@ -22,14 +27,19 @@ alias c='cd ..'
 alias cdr='cdroot'
 alias ls='eza -F --group-directories-first'
 alias la='ls -a'
-alias s='ls --git-ignore -I "*.meta"'
+alias s='ls --git-ignore'
 alias v='nvim'
+alias m='mise'
 alias g='git'
 alias gg='lazygit'
 alias lss='ls -lh'
 alias mkdir='mkdir -p'
 alias zip='zip -r'
 alias -g G=' | grep'
+
+precmd() {
+  print -Pn "\e]0;%n@%m %~\a %(!.#.$)"
+}
 
 chpwd() {
   s
@@ -39,34 +49,62 @@ cdroot() {
   cd `git rev-parse --show-toplevel`
 }
 
+setopt auto_pushd
+setopt list_types
+setopt pushd_ignore_dups
+setopt auto_remove_slash
+setopt ignoreeof
+
+umask 022
+
+stty stop undef
+
+WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 fignore=(.o .obj .bak .hi .deps .meta .asset .mdb .sln .unity)
+
+zstyle :compinstall filename '~/.zshrc'
+zstyle ':completion:*' accept-exact '*(N)'
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' completer _oldlist _complete _ignored
+
+autoload -Uz compinit
+compinit
+
+ZSH_AUTOSUGGEST_STRATEGY=(completion)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_USE_ASYNC=true
+[ -d /opt/homebrew/share/zsh-autosuggestions ] && source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+[ -d /usr/share/zsh/plugins/zsh-autosuggestions ] && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# workaround https://github.com/zsh-users/zsh-autosuggestions/issues/512
+_zsh_autosuggest_capture_postcompletion() {
+  unset 'compstate[list]'
+}
+
+autoload colors
+colors
 
 export PATH=$HOME/.local/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
-# Deno
-export DENO_INSTALL=$HOME/.deno
-export PATH=$DENO_INSTALL/bin:$PATH
+# Brew (for macOS)
+command -v /opt/homebrew/bin/brew >/dev/null 2>&1 && eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# OCaml
-. $HOME/.opam/opam-init/init.zsh >/dev/null 2>&1 || true
+# Mise
+if command -v mise >/dev/null 2>&1; then
+  case $- in
+  *i*)
+    eval "$(mise activate)"
+    ;;
+  *)
+    eval "$(mise activate --shims)"
+    ;;
+  esac
+fi
 
-# Rust
-export PATH=$HOME/.cargo/bin:$PATH
-export LLVMENV_RUST_BINDING=1
-
-# Python
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-
-# .NET
-export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
-export DOTNET_CLI_UI_LANGUAGE=en-us
-export PATH=$HOME/.dotnet/tools:$PATH
-alias dot='TERM=xterm dotnet'
-
-# Java
-export PATH="$HOME/.jenv/bin:$PATH"
+# -----------------------
+# Tools
+# -----------------------
 
 # Docker
 alias d='docker'
@@ -91,59 +129,37 @@ export PATH=$HOME/.google-cloud-sdk/bin:$PATH
 if [ -f "$HOME/.google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/.google-cloud-sdk/path.zsh.inc"; fi
 if [ -f "$HOME/.google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/.google-cloud-sdk/completion.zsh.inc"; fi
 
-bindkey '^f' forward-word
-bindkey '^b' backward-word
+# GO
+export GOPATH=$HOME/.go
 
-autoload colors
-colors
+# --- TODO ---
 
-setopt auto_pushd
-setopt list_types
-setopt pushd_ignore_dups
-setopt auto_remove_slash
+# Deno
+export DENO_INSTALL=$HOME/.deno
+export PATH=$DENO_INSTALL/bin:$PATH
 
-autoload -Uz compinit
-compinit
+# OCaml
+. $HOME/.opam/opam-init/init.zsh >/dev/null 2>&1 || true
 
-zstyle ':completion:*' accept-exact '*(N)'
-zstyle ':completion:*:cd:*' ignore-parents parent pwd
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*' completer _oldlist _complete _ignored
+# Rust
+export PATH=$HOME/.cargo/bin:$PATH
+export LLVMENV_RUST_BINDING=1
 
-setopt ignoreeof
-
-WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
-
-stty stop undef
-
-umask 022
-
-autoload -Uz zmv
-alias zmv='noglob zmv -w'
-
-precmd() {
-  print -Pn "\e]0;%n@%m %~\a %(!.#.$)"
-}
-
-ZSH_AUTOSUGGEST_STRATEGY=(completion)
-ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-ZSH_AUTOSUGGEST_USE_ASYNC=true
-[ -d /opt/homebrew/share/zsh-autosuggestions ] && source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-[ -d /usr/share/zsh/plugins/zsh-autosuggestions ] && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-# workaround https://github.com/zsh-users/zsh-autosuggestions/issues/512
-_zsh_autosuggest_capture_postcompletion() {
-  unset 'compstate[list]'
-}
-
-command -v /opt/homebrew/bin/brew >/dev/null 2>&1 && eval "$(/opt/homebrew/bin/brew shellenv)"
-[ -f "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env" ] && source "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}/.ghcup/env"
-command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
-command -v goenv >/dev/null 2>&1 && eval "$(goenv init -)"
-command -v jenv >/dev/null 2>&1 && eval "$(jenv init -)"
-command -v rbenv >/dev/null 2>&1 && eval "$(rbenv init - zsh)"
+# Python
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 command -v pyenv >/dev/null 2>&1 && eval "$(pyenv init -)"
-command -v nodenv >/dev/null 2>&1 && eval "$(nodenv init -)"
+
+# .NET
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+export DOTNET_CLI_UI_LANGUAGE=en-us
+export PATH=$HOME/.dotnet/tools:$PATH
+alias dot='TERM=xterm dotnet'
+
+# LLVM
+command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
+
+# -----------------------
 
 eval "$(starship init zsh)"
-eval "$(direnv hook zsh)"
 

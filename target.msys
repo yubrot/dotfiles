@@ -1,6 +1,5 @@
 .bashrc
 .config/bat/config
-.config/direnv/direnvrc
 .config/git/config
 .config/git/ignore
 .config/nvim/init.lua

@@ -3,7 +3,6 @@
 .config/wezterm/wezterm.lua
 .config/karabiner
 .config/bat/config
-.config/direnv/direnvrc
 .config/git/config
 .config/git/ignore
 .config/nvim/init.lua
