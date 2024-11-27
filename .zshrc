@@ -10,43 +10,8 @@ bindkey -e
 bindkey '^f' forward-word
 bindkey '^b' backward-word
 
-case "${OSTYPE}" in
-darwin*)
-  alias cp='cp -apR'
-  export EDITOR=/opt/homebrew/bin/nvim
-  ;;
-linux*)
-  alias cp='cp -apr'
-  export EDITOR=/usr/bin/nvim
-  export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
-  ;;
-esac
-
-alias scp='scp -r'
-alias c='cd ..'
-alias cdr='cdroot'
-alias ls='eza -F --group-directories-first'
-alias la='ls -a'
-alias s='ls --git-ignore'
-alias v='nvim'
-alias m='mise'
-alias g='git'
-alias gg='lazygit'
-alias lss='ls -lh'
-alias mkdir='mkdir -p'
-alias zip='zip -r'
-alias -g G=' | grep'
-
 precmd() {
   print -Pn "\e]0;%n@%m %~\a %(!.#.$)"
-}
-
-chpwd() {
-  s
-}
-
-cdroot() {
-  cd `git rev-parse --show-toplevel`
 }
 
 setopt auto_pushd
@@ -106,6 +71,41 @@ fi
 # Tools
 # -----------------------
 
+case "${OSTYPE}" in
+darwin*)
+  alias cp='cp -apR'
+  export EDITOR=/opt/homebrew/bin/nvim
+  ;;
+linux*)
+  alias cp='cp -apr'
+  export EDITOR=/usr/bin/nvim
+  export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
+  ;;
+esac
+
+alias scp='scp -r'
+alias c='cd ..'
+alias cdr='cdroot'
+alias ls='eza -F --group-directories-first'
+alias la='ls -a'
+alias s='ls --git-ignore'
+alias v='nvim'
+alias m='mise'
+alias g='git'
+alias gg='lazygit'
+alias lss='ls -lh'
+alias mkdir='mkdir -p'
+alias zip='zip -r'
+alias -g G=' | grep'
+
+chpwd() {
+  s
+}
+
+cdroot() {
+  cd `git rev-parse --show-toplevel`
+}
+
 # Docker
 alias d='docker'
 alias dc='docker compose'
@@ -131,33 +131,6 @@ if [ -f "$HOME/.google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/.google-cl
 
 # GO
 export GOPATH=$HOME/.go
-
-# --- TODO ---
-
-# Deno
-export DENO_INSTALL=$HOME/.deno
-export PATH=$DENO_INSTALL/bin:$PATH
-
-# OCaml
-. $HOME/.opam/opam-init/init.zsh >/dev/null 2>&1 || true
-
-# Rust
-export PATH=$HOME/.cargo/bin:$PATH
-export LLVMENV_RUST_BINDING=1
-
-# Python
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-command -v pyenv >/dev/null 2>&1 && eval "$(pyenv init -)"
-
-# .NET
-export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
-export DOTNET_CLI_UI_LANGUAGE=en-us
-export PATH=$HOME/.dotnet/tools:$PATH
-alias dot='TERM=xterm dotnet'
-
-# LLVM
-command -v llvmenv >/dev/null 2>&1 && source <(llvmenv zsh)
 
 # -----------------------
 
