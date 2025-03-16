@@ -13,7 +13,7 @@ function init()
     ms[i] = Monitor.new(i, Box.fromRect(screen:frame()))
   end
 
-  local h = {{0, 0.15, 0.3}, {0.25, 0.5, 0.75}, {0.7, 0.85, 1}}
+  local h = {{0, 0.125, 0.25}, {0.25, 0.5, 0.75}, {0.75, 0.875, 1}}
   local v = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}}
   local frames = {}
   for x = 1, #h do
@@ -24,7 +24,7 @@ function init()
   table.insert(frames, Frame.new("2", 2, {0, 0.5, 1}, {0, 0.5, 1}, {[Direction.top] = "1-2-2"}))
   local fs = FrameSet.new()
   fs:initialize(frames)
-  fs:populate(ms, 0)
+  fs:populate(ms, 10)
 
   hs.window.animationDuration = 0
   hs.window.spacesModifiers = {alt = true}
@@ -34,7 +34,7 @@ function init()
   hs.hotkey.bind({"alt"}, "return", function() operation.focusByApplication(fs, "WezTerm") end)
   hs.hotkey.bind({"alt"}, "b", function() operation.focusByApplication(fs, "Firefox") end)
   hs.hotkey.bind({"alt"}, "c", function() operation.focusByApplication(fs, "Slack") end)
-  hs.hotkey.bind({"alt"}, "v", function() operation.focusByApplication(fs, "Visual Studio Code") end)
+  hs.hotkey.bind({"alt"}, "v", function() operation.focusByApplication(fs, "Cursor") end)
   hs.hotkey.bind({"alt"}, "n", function() operation.focusByApplication(fs, "Obsidian") end)
 
   hs.hotkey.bind({"alt", "shift"}, "c", operation.closeWindow)
