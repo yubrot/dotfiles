@@ -1,4 +1,5 @@
 .DS_Store
 *~
-mise.toml
+mise.local.toml
 .mbin
+.vscode
