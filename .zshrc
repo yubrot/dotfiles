@@ -103,27 +103,35 @@ chpwd() {
 }
 
 cdr() {
-  builtin cd `git rev-parse --show-toplevel`
+  builtin cd $(git rev-parse --show-toplevel)
 }
 
 vf() {
-  v "$(fd -H -t f -0 "$@" . | f --read0 -0 -1 -m)"
+  v $(fd -t f | eval $(grep_and "$@") | f -0 -1 -m)
+}
+
+vfa() {
+  v $(fd -H -t f | eval $(grep_and "$@") | f -0 -1 -m)
 }
 
 cf() {
-  builtin cd "$(fd -H -t d -0 "$@" . | f --read0 -0 -1)"
+  builtin cd $(fd -t d | eval $(grep_and "$@") | f -0 -1)
 }
 
-qf() {
-  builtin cd "$(q list -p | eval $(grep_and "$@") | f -0 -1)"
+cfa() {
+  builtin cd $(fd -H -t d | eval $(grep_and "$@") | f -0 -1)
+}
+
+cq() {
+  builtin cd $(q list -p | eval $(grep_and "$@") | f -0 -1)
 }
 
 gf() {
-  g b | eval $(grep_and "$@") | f -0 -1 | xargs git co
+  g co $(g b | eval $(grep_and "$@") | f -0 -1)
 }
 
 gfr() {
-  g b -r | eval $(grep_and "$@") | f -0 -1 | xargs git co
+  g co $(g b -r | eval $(grep_and "$@") | f -0 -1)
 }
 
 grep_and() {
