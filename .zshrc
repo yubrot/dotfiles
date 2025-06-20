@@ -97,9 +97,6 @@ alias q='ghq'
 alias lss='ls -lh'
 alias mkdir='mkdir -p'
 alias zip='zip -r'
-alias -g G=' | grep'
-alias -g F=' | fzf'
-alias -g X=' | xargs'
 
 chpwd() {
   s
@@ -110,23 +107,31 @@ cdr() {
 }
 
 vf() {
-  v "$(fd -H -t f -0 "$@" . F --read0 -0 -1 -m)"
+  v "$(fd -H -t f -0 "$@" . | f --read0 -0 -1 -m)"
 }
 
 cf() {
-  builtin cd "$(fd -H -t d -0 "$@" . F --read0 -0 -1)"
+  builtin cd "$(fd -H -t d -0 "$@" . | f --read0 -0 -1)"
 }
 
 qf() {
-  builtin cd "$(q list -p F -1)"
+  builtin cd "$(q list -p | eval $(grep_and "$@") | f -0 -1)"
 }
 
 gf() {
-  g b F X git co
+  g b | eval $(grep_and "$@") | f -0 -1 | xargs git co
 }
 
 gfr() {
-  g b -r F X git co
+  g b -r | eval $(grep_and "$@") | f -0 -1 | xargs git co
+}
+
+grep_and() {
+  local cmd="cat -"
+  for v in "$@"; do
+    cmd+=" | grep -e \"$v\""
+  done
+  echo "$cmd"
 }
 
 # Docker
