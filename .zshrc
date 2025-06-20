@@ -85,25 +85,48 @@ esac
 
 alias scp='scp -r'
 alias c='cd ..'
-alias cdr='cdroot'
 alias ls='eza -F --group-directories-first'
 alias la='ls -a'
 alias s='ls --git-ignore'
 alias v='nvim'
 alias m='mise'
+alias f='fzf'
 alias g='git'
 alias gg='lazygit'
+alias q='ghq'
 alias lss='ls -lh'
 alias mkdir='mkdir -p'
 alias zip='zip -r'
 alias -g G=' | grep'
+alias -g F=' | fzf'
+alias -g X=' | xargs'
 
 chpwd() {
   s
 }
 
-cdroot() {
-  cd `git rev-parse --show-toplevel`
+cdr() {
+  builtin cd `git rev-parse --show-toplevel`
+}
+
+vf() {
+  v "$(fd -H -t f -0 "$@" . F --read0 -0 -1 -m)"
+}
+
+cf() {
+  builtin cd "$(fd -H -t d -0 "$@" . F --read0 -0 -1)"
+}
+
+qf() {
+  builtin cd "$(q list -p F -1)"
+}
+
+gf() {
+  g b F X git co
+}
+
+gfr() {
+  g b -r F X git co
 }
 
 # Docker

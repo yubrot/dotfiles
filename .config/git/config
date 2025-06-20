@@ -61,3 +61,6 @@
 [credential "https://gist.github.com"]
   helper = 
   helper = !/usr/bin/gh auth git-credential
+[ghq]
+	root = ~/.go/src
+	root = ~/in
