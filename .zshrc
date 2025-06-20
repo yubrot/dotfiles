@@ -129,7 +129,7 @@ gfr() {
 grep_and() {
   local cmd="cat -"
   for v in "$@"; do
-    cmd+=" | grep -e \"$v\""
+    cmd+=" | grep -i -e \"$v\""
   done
   echo "$cmd"
 }
