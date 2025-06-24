@@ -1,20 +1,33 @@
-local packer_path = vim.fn.stdpath("data").."/site/pack/packer/start/packer.nvim"
-if vim.fn.empty(vim.fn.glob(packer_path)) > 0 then
-  vim.fn.system({"git", "clone", "--depth", "1", "https://github.com/wbthomason/packer.nvim", packer_path})
-  vim.cmd [[packadd packer.nvim]]
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
 end
+vim.opt.rtp:prepend(lazypath)
 
-require("packer").startup(function(use)
-  use "wbthomason/packer.nvim"
-  use "EdenEast/nightfox.nvim"
-  use "gbprod/substitute.nvim"
-  use "monaqa/dial.nvim"
-  use { "kylechui/nvim-surround", tag = "*" }
-  use { "nvim-lualine/lualine.nvim", requires = "nvim-tree/nvim-web-devicons" }
-  use { "willothy/nvim-cokeline", requires = "nvim-tree/nvim-web-devicons" }
-  use { "nvim-telescope/telescope.nvim", requires = "nvim-lua/plenary.nvim" }
-  use { "sustech-data/wildfire.nvim", requires = "nvim-treesitter/nvim-treesitter" }
-end)
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+
+require("lazy").setup({
+  "EdenEast/nightfox.nvim",
+  "gbprod/substitute.nvim",
+  "monaqa/dial.nvim",
+  { "kylechui/nvim-surround", version = "*" },
+  { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
+  { "willothy/nvim-cokeline", dependencies = { "nvim-tree/nvim-web-devicons" } },
+  { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
+  { "sustech-data/wildfire.nvim", dependencies = { "nvim-treesitter/nvim-treesitter" } },
+})
 
 -- UI
 if not vim.g.vscode then
@@ -71,7 +84,6 @@ vim.keymap.set("n", "S", require('substitute').eol)
 vim.keymap.set("v", "s", require('substitute').visual)
 vim.keymap.set({"n", "v"}, "n", "nzz", { noremap = true })
 vim.keymap.set({"n", "v"}, "N", "Nzz", { noremap = true })
-vim.g.mapleader = " "
 vim.keymap.set({"n", "v"}, "<leader>h", "^", { noremap = true })
 vim.keymap.set({"n", "v"}, "<leader>l", "$", { noremap = true })
 vim.keymap.set({"n", "v"}, "<leader>j", "10j", { noremap = true })
