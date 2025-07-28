@@ -34,7 +34,7 @@ function init()
   hs.hotkey.bind({"alt"}, "return", function() operation.focusByApplication(fs, "WezTerm") end)
   hs.hotkey.bind({"alt"}, "b", function() operation.focusByApplication(fs, "Firefox") end)
   hs.hotkey.bind({"alt"}, "c", function() operation.focusByApplication(fs, "Slack") end)
-  hs.hotkey.bind({"alt"}, "v", function() operation.focusByApplication(fs, "Cursor") end)
+  hs.hotkey.bind({"alt"}, "v", function() operation.focusByApplication(fs, "Visual Studio Code") end)
   hs.hotkey.bind({"alt"}, "n", function() operation.focusByApplication(fs, "Obsidian") end)
 
   hs.hotkey.bind({"alt", "shift"}, "c", operation.closeWindow)

@@ -3,4 +3,7 @@
 mise.local.toml
 .mbin
 .vscode
+.claude/settings.local.json
+CLAUDE.local.md
+
 **/.claude/settings.local.json
