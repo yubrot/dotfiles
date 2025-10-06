@@ -17,7 +17,7 @@ def configure(keymap: Any) -> None:
     # sub = [Frame("0", 0, (0, 0.5, 1), (0, 0.5, 1), {Direction.TOP: "1-2-2"})]
     fs = FrameSet()
     fs.initialize(*main)
-    fs.populate(ms, 0)
+    fs.populate(ms, 10)
 
     def is_ignored_window(win: Any) -> bool:
         if win.getText() == "":
@@ -69,7 +69,7 @@ def configure(keymap: Any) -> None:
     bind["U0-B"] = lambda: Operation.focus_by_application(fs, "firefox.exe")
     bind["U0-C"] = lambda: Operation.focus_by_application(fs, "slack.exe")
     bind["U0-V"] = lambda: Operation.focus_by_application(fs, "Code.exe")
-    bind["U0-N"] = lambda: Operation.focus_by_application(fs, "Obsidian.exe")
+    bind["U0-N"] = lambda: Operation.focus_by_application(fs, "Notion.exe")
 
     bind["U0-S-C"] = Operation.close_window
 
