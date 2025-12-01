@@ -7,30 +7,39 @@ function init()
   Monitor.test()
   Frame.test()
 
-  local monitors = {}
-  for i, screen in ipairs(hs.screen.allScreens()) do
-    monitors[i] = Monitor.new(i, Box.fromRect(screen:frame()))
-  end
-  monitors.primary = Monitor.primary(monitors)
-  monitors.secondaries = hs.fnutils.filter(monitors, function(m) return m ~= monitors.primary end)
+  Frame.padding = 10
 
-  local layout
-  if monitors.primary:size().x >= 2560 then
-    layout = {
+  local ms = {}
+  do
+    for i, screen in ipairs(hs.screen.allScreens()) do
+      ms[i] = Monitor.new(i, Box.fromRect(screen:frame()))
+    end
+    ms.primary = Monitor.primary(ms)
+    ms.secondaries = hs.fnutils.filter(ms, function(m) return m ~= ms.primary end)
+  end
+
+  local fs = {}
+  do
+    local layout = ms.primary:size().x >= 2560 and {
       xp = {{0, 0.125, 0.25}, {0.25, 0.5, 0.75}, {0.75, 0.875, 1}},
       yp = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}},
-    }
-  else
-    layout = {
+    } or {
       xp = {{0, 0.3, 0.6}, {0.6, 0.8, 1}},
       yp = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}},
     }
+
+    local main = Frame.tile("primary", ms.primary, layout.xp, layout.yp, fs)
+    for _, m in pairs(ms.secondaries) do
+      local sub = Frame.new(string.format("sub-%s", m.id), m, {0, 0.5, 1}, {0, 0.5, 1})
+      fs[sub.id] = sub
+
+      local dir = ms.primary:center():directionTo(m:center())
+      local side = main[dir]
+      for i, f in ipairs(side) do
+        f:linkTo(sub, dir, i == math.ceil(#side / 2))
+      end
+    end
   end
-
-  Frame.padding = 10
-
-  local fs = {}
-  local primary = Frame.tile("primary", monitors.primary, layout.xp, layout.yp, fs)
 
   hs.window.animationDuration = 0
   hs.window.spacesModifiers = {alt = true}
@@ -257,6 +266,10 @@ end
 
 function Monitor:size()
   return self.box:size()
+end
+
+function Monitor:center()
+  return self.box:center()
 end
 
 function Monitor:map(vec, padding)
