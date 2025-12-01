@@ -1,4 +1,4 @@
--- Based on AppData/Roaming/Keyhac/config.py
+-- Based on ApeData/Roaming/Keyhac/config.py
 
 function init()
   Vector.test()
@@ -6,69 +6,72 @@ function init()
   Direction.test()
   Monitor.test()
   Frame.test()
-  FrameSet.test()
 
-  local ms = {}
+  local monitors = {}
   for i, screen in ipairs(hs.screen.allScreens()) do
-    ms[i] = Monitor.new(i, Box.fromRect(screen:frame()))
+    monitors[i] = Monitor.new(i, Box.fromRect(screen:frame()))
+  end
+  monitors.primary = Monitor.primary(monitors)
+  monitors.secondaries = hs.fnutils.filter(monitors, function(m) return m ~= monitors.primary end)
+
+  local layout
+  if monitors.primary:size().x >= 2560 then
+    layout = {
+      xp = {{0, 0.125, 0.25}, {0.25, 0.5, 0.75}, {0.75, 0.875, 1}},
+      yp = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}},
+    }
+  else
+    layout = {
+      xp = {{0, 0.3, 0.6}, {0.6, 0.8, 1}},
+      yp = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}},
+    }
   end
 
-  local h = {{0, 0.125, 0.25}, {0.25, 0.5, 0.75}, {0.75, 0.875, 1}}
-  local v = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}}
-  local frames = {}
-  for x = 1, #h do
-    for y = 1, #v do
-      table.insert(frames, Frame.panel(h, v, {[Direction.bottom] = "2"}, 1, x, y))
-    end
-  end
-  table.insert(frames, Frame.new("2", 2, {0, 0.5, 1}, {0, 0.5, 1}, {[Direction.top] = "1-2-2"}))
-  local fs = FrameSet.new()
-  fs:initialize(frames)
-  fs:populate(ms, 10)
+  Frame.padding = 10
+
+  local fs = {}
+  local primary = Frame.tile("primary", monitors.primary, layout.xp, layout.yp, fs)
 
   hs.window.animationDuration = 0
   hs.window.spacesModifiers = {alt = true}
 
   hs.hotkey.bind({"alt", "ctrl"}, "r", hs.reload)
 
-  hs.hotkey.bind({"alt"}, "return", function() operation.focusByApplication(fs, "WezTerm") end)
-  hs.hotkey.bind({"alt"}, "b", function() operation.focusByApplication(fs, "Firefox") end)
-  hs.hotkey.bind({"alt"}, "c", function() operation.focusByApplication(fs, "Slack") end)
-  hs.hotkey.bind({"alt"}, "v", function() operation.focusByApplication(fs, "Visual Studio Code") end)
-  hs.hotkey.bind({"alt"}, "n", function() operation.focusByApplication(fs, "Notion") end)
+  hs.hotkey.bind({"alt"}, "return", function() window.focusByApplication(fs, "WezTerm") end)
+  hs.hotkey.bind({"alt"}, "b", function() window.focusByApplication(fs, "Firefox") end)
+  hs.hotkey.bind({"alt"}, "c", function() window.focusByApplication(fs, "Slack") end)
+  hs.hotkey.bind({"alt"}, "v", function() window.focusByApplication(fs, "Visual Studio Code") end)
+  hs.hotkey.bind({"alt"}, "n", function() window.focusByApplication(fs, "Notion") end)
 
-  hs.hotkey.bind({"alt", "shift"}, "c", operation.closeWindow)
+  hs.hotkey.bind({"alt", "shift"}, "c", window.close)
 
-  hs.hotkey.bind({"alt"}, "m", operation.toggleMaximizeWindow)
+  hs.hotkey.bind({"alt"}, "m", window.toggleMaximize)
 
-  hs.hotkey.bind({"alt"}, "k", function() operation.focusFrameByDirection(fs, Direction.top) end)
-  hs.hotkey.bind({"alt"}, "j", function() operation.focusFrameByDirection(fs, Direction.bottom) end)
-  hs.hotkey.bind({"alt"}, "h", function() operation.focusFrameByDirection(fs, Direction.left) end)
-  hs.hotkey.bind({"alt"}, "l", function() operation.focusFrameByDirection(fs, Direction.right) end)
+  hs.hotkey.bind({"alt"}, "k", function() window.focusByDirection(fs, Direction.top) end)
+  hs.hotkey.bind({"alt"}, "j", function() window.focusByDirection(fs, Direction.bottom) end)
+  hs.hotkey.bind({"alt"}, "h", function() window.focusByDirection(fs, Direction.left) end)
+  hs.hotkey.bind({"alt"}, "l", function() window.focusByDirection(fs, Direction.right) end)
 
-  hs.hotkey.bind({"alt"}, "i", function() operation.focusWindowInFrame(fs, 1) end)
-  hs.hotkey.bind({"alt"}, "o", function() operation.focusWindowInFrame(fs, -1) end)
+  hs.hotkey.bind({"alt"}, "i", function() window.focusByFrame(fs, nil, 1) end)
+  hs.hotkey.bind({"alt"}, "o", function() window.focusByFrame(fs, nil, -1) end)
 
-  hs.hotkey.bind({"alt"}, "e", function() operation.moveWindowByDirection(fs, Direction.top) end)
-  hs.hotkey.bind({"alt"}, "d", function() operation.moveWindowByDirection(fs, Direction.bottom) end)
-  hs.hotkey.bind({"alt"}, "s", function() operation.moveWindowByDirection(fs, Direction.left) end)
-  hs.hotkey.bind({"alt"}, "f", function() operation.moveWindowByDirection(fs, Direction.right) end)
+  hs.hotkey.bind({"alt"}, "e", function() window.moveByDirection(fs, Direction.top) end)
+  hs.hotkey.bind({"alt"}, "d", function() window.moveByDirection(fs, Direction.bottom) end)
+  hs.hotkey.bind({"alt"}, "s", function() window.moveByDirection(fs, Direction.left) end)
+  hs.hotkey.bind({"alt"}, "f", function() window.moveByDirection(fs, Direction.right) end)
 
-  hs.hotkey.bind({"alt", "shift"}, "i", function() operation.resetWindowSize(fs) end)
+  hs.hotkey.bind({"alt", "shift"}, "i", function() window.resetSize(fs) end)
 
-  hs.hotkey.bind({"alt", "shift"}, "k", function() operation.resizeWindowByDirection(fs, Direction.top, 0.1) end)
-  hs.hotkey.bind({"alt", "shift"}, "j", function() operation.resizeWindowByDirection(fs, Direction.bottom, 0.1) end)
-  hs.hotkey.bind({"alt", "shift"}, "h", function() operation.resizeWindowByDirection(fs, Direction.left, 0.1) end)
-  hs.hotkey.bind({"alt", "shift"}, "l", function() operation.resizeWindowByDirection(fs, Direction.right, 0.1) end)
+  hs.hotkey.bind({"alt", "shift"}, "k", function() window.resizeByDirection(fs, Direction.top, 0.1) end)
+  hs.hotkey.bind({"alt", "shift"}, "j", function() window.resizeByDirection(fs, Direction.bottom, 0.1) end)
+  hs.hotkey.bind({"alt", "shift"}, "h", function() window.resizeByDirection(fs, Direction.left, 0.1) end)
+  hs.hotkey.bind({"alt", "shift"}, "l", function() window.resizeByDirection(fs, Direction.right, 0.1) end)
 end
 
 Vector = {}
 
 function Vector.new(x, y)
-  return setmetatable({
-    x = x,
-    y = y,
-  }, Vector.mt)
+  return setmetatable({ x = x, y = y }, Vector.mt)
 end
 
 function Vector:eq(other)
@@ -84,11 +87,37 @@ function Vector:sub(other)
 end
 
 function Vector:mul(s)
-  return Vector.new(self.x * s, self.y * s)
+  if type(s) == "number" then
+    return Vector.new(self.x * s, self.y * s)
+  else
+    return Vector.new(self.x * s.x, self.y * s.y)
+  end
+end
+
+function Vector:scalar()
+  return math.sqrt(self.x ^ 2 + self.y ^ 2)
+end
+
+function Vector:direction()
+  local r = math.atan(-self.y, self.x) / math.pi * 4
+
+  if r > -1 and r <= 1 then
+    return Direction.right
+  elseif r > 1 and r <= 3 then
+    return Direction.top
+  elseif r > -3 and r <= -1 then
+    return Direction.bottom
+  else
+    return Direction.left
+  end
 end
 
 function Vector:distanceTo(other)
-  return math.abs(self.x - other.x) + math.abs(self.y - other.y)
+  return (other - self):scalar()
+end
+
+function Vector:directionTo(other)
+  return (other - self):direction()
 end
 
 function Vector:tostring()
@@ -102,7 +131,11 @@ function Vector.test()
   assert(Vector.new(3, 5) + Vector.new(1, 4) == Vector.new(4, 9))
   assert(Vector.new(3, 5) - Vector.new(1, 4) == Vector.new(2, 1))
   assert(Vector.new(3, 5) * 3 == Vector.new(9, 15))
-  assert(Vector.new(3, 5):distanceTo(Vector.new(5, 8)) == 5)
+  assert(Vector.new(3, 5) * Vector.new(3, 4) == Vector.new(9, 20))
+  assert(Vector.new(3, 4):scalar() == 5)
+  assert(Vector.new(1, -3):direction() == Direction.top)
+  assert(Vector.new(3, 5):distanceTo(Vector.new(7, 2)) == 5)
+  assert(Vector.new(3, 5):directionTo(Vector.new(-4, 4)) == Direction.left)
 end
 
 Vector.mt = {
@@ -116,15 +149,16 @@ Vector.mt = {
 
 Box = {}
 
-function Box.new(x1, y1, x2, y2)
-  return setmetatable({
-    min = Vector.new(x1, y1),
-    max = Vector.new(x2, y2),
-  }, Box.mt)
+function Box.new(min, max)
+  return setmetatable({ min = min, max = max }, Box.mt)
+end
+
+function Box.box(x1, y1, x2, y2)
+  return Box.new(Vector.new(x1, y1), Vector.new(x2, y2))
 end
 
 function Box.fromRect(rect)
-  return Box.new(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h)
+  return Box.box(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h)
 end
 
 function Box:eq(other)
@@ -132,12 +166,7 @@ function Box:eq(other)
 end
 
 function Box:mul(other)
-  return Box.new(
-    self.min.x * other.x,
-    self.min.y * other.y,
-    self.max.x * other.x,
-    self.max.y * other.y
-  )
+  return Box.new(self.min * other, self.max * other)
 end
 
 function Box:size()
@@ -157,12 +186,12 @@ function Box:tostring()
 end
 
 function Box.test()
-  assert(Box.new(5, 10, 15, 25) == Box.new(5, 10, 15, 25))
-  assert(Box.new(5, 10, 15, 25) ~= Box.new(5, 10, 15, 30))
-  assert(tostring(Box.new(5, 10, 15, 25)) == "(5, 10 .. 15, 25)")
-  assert(Box.new(5, 10, 15, 25):size() == Vector.new(10, 15))
-  assert(Box.new(-1, -2, 3, 4) * Vector.new(2, 3) == Box.new(-2, -6, 6, 12))
-  assert(Box.new(5, 10, 15, 30):center() == Vector.new(10, 20))
+  assert(Box.box(5, 10, 15, 25) == Box.box(5, 10, 15, 25))
+  assert(Box.box(5, 10, 15, 25) ~= Box.box(5, 10, 15, 30))
+  assert(tostring(Box.box(5, 10, 15, 25)) == "(5, 10 .. 15, 25)")
+  assert(Box.box(5, 10, 15, 25):size() == Vector.new(10, 15))
+  assert(Box.box(-1, -2, 3, 4) * Vector.new(2, 3) == Box.box(-2, -6, 6, 12))
+  assert(Box.box(5, 10, 15, 30):center() == Vector.new(10, 20))
 end
 
 Box.mt = {
@@ -174,35 +203,32 @@ Box.mt = {
 
 Direction = {}
 
-function Direction.new(key, neighborKeys, vector)
-  return setmetatable({
-    key = key,
-    neighborKeys = neighborKeys,
-    vector = vector,
-  }, Direction.mt)
-end
-
-function Direction:visitOrder()
-  local t = {self}
-  for i, nk in ipairs(self.neighborKeys) do
-    t[i + 1] = Direction[nk]
-  end
-  return t
+function Direction.new(id, vector)
+  return setmetatable({ id = id, vector = vector, neighbors = {} }, Direction.mt)
 end
 
 function Direction:tostring()
-  return self.key
+  return self.id
+end
+
+function Direction:letInverse(other)
+  self.inverse = other
+  other.inverse = self
+end
+
+function Direction:letNeighbors(...)
+  for _, other in next, {...} do
+    table.insert(self.neighbors, other)
+    table.insert(other.neighbors, self)
+  end
 end
 
 function Direction.test()
-  assert(Direction.top == Direction.top)
-  assert(Direction.top ~= Direction.left)
   assert(tostring(Direction.bottom) == "bottom")
-  assert(Direction.top:visitOrder()[1] == Direction.top)
-  assert(Direction.top:visitOrder()[2] == Direction.left)
-  assert(Direction.top:visitOrder()[3] == Direction.right)
-  assert(Direction.top:visitOrder()[4] == nil)
-  assert(Direction.top.vector == Vector.new(0, -1))
+  assert(Direction.top.inverse == Direction.bottom)
+  assert(Direction.top.neighbors[1] == Direction.left)
+  assert(Direction.top.neighbors[2] == Direction.right)
+  assert(Direction.top.neighbors[3] == nil)
 end
 
 Direction.mt = {
@@ -210,10 +236,15 @@ Direction.mt = {
   __tostring = Direction.tostring,
 }
 
-Direction.top = Direction.new("top", {"left", "right"}, Vector.new(0, -1))
-Direction.bottom = Direction.new("bottom", {"left", "right"}, Vector.new(0, 1))
-Direction.left = Direction.new("left", {"top", "bottom"}, Vector.new(-1, 0))
-Direction.right = Direction.new("right", {"top", "bottom"}, Vector.new(1, 0))
+Direction.top = Direction.new("top", Vector.new(0, -1))
+Direction.bottom = Direction.new("bottom", Vector.new(0, 1))
+Direction.left = Direction.new("left", Vector.new(-1, 0))
+Direction.right = Direction.new("right", Vector.new(1, 0))
+
+Direction.top:letInverse(Direction.bottom)
+Direction.left:letInverse(Direction.right)
+Direction.top:letNeighbors(Direction.left, Direction.right)
+Direction.bottom:letNeighbors(Direction.left, Direction.right)
 
 Monitor = {}
 
@@ -224,21 +255,49 @@ function Monitor.new(id, box)
   }, Monitor.mt)
 end
 
-function Monitor:map(vec)
+function Monitor:size()
+  return self.box:size()
+end
+
+function Monitor:map(vec, padding)
+  local px = (vec.x == 0 or vec.x == 1) and 1 or 0.5
+  local py = (vec.y == 0 or vec.y == 1) and 1 or 0.5
   return Vector.new(
-    self.box.min.x * (1 - vec.x) + self.box.max.x * vec.x,
-    self.box.min.y * (1 - vec.y) + self.box.max.y * vec.y)
+    self.box.min.x * (1 - vec.x) + self.box.max.x * vec.x + px * padding,
+    self.box.min.y * (1 - vec.y) + self.box.max.y * vec.y + py * padding
+  )
 end
 
 function Monitor:tostring()
   return "Monitor(" .. self.id .. ", box=" .. tostring(self.box) .. ")"
 end
 
+function Monitor.primary(ms)
+  local primary = nil
+  local size = nil
+  for _, item in ipairs(ms) do
+    local s = item:size():scalar()
+    if not size or size < s then
+      primary = item
+      size = s
+    end
+  end
+  return primary
+end
+
 function Monitor.test()
-  local m = Monitor.new(1, Box.new(0, 0, 1680, 1050))
-  assert(m:map(Vector.new(0, 0)) == Vector.new(0, 0))
-  assert(m:map(Vector.new(1, 1)) == Vector.new(1680, 1050))
-  assert(m:map(Vector.new(0.25, 0.5)) == Vector.new(420, 525))
+  local m = Monitor.new(1, Box.box(0, 0, 1680, 1050))
+  assert(m:size() == Vector.new(1680, 1050))
+  assert(m:map(Vector.new(0, 0), 10) == Vector.new(10, 10))
+  assert(m:map(Vector.new(0.5, 0), 10) == Vector.new(845, 10))
+  assert(m:map(Vector.new(1, 1), -10) == Vector.new(1670, 1040))
+  assert(m:map(Vector.new(0.25, 0.5), 0) == Vector.new(420, 525))
+  local ms = {
+    Monitor.new(1, Box.box(0, 0, 100, 100)),
+    Monitor.new(2, Box.box(100, 0, 400, 100)),
+    Monitor.new(3, Box.box(-100, 0, 0, 150)),
+  }
+  assert(Monitor.primary(ms).id == 2)
 end
 
 Monitor.mt = {
@@ -248,98 +307,139 @@ Monitor.mt = {
 
 Frame = {}
 
-function Frame.new(id, monitorId, x, y, links)
-  local t = y[1] ~= 0 and 1 or 0
-  local b = y[3] ~= 1 and 1 or 0
-  local l = x[1] ~= 0 and 1 or 0
-  local r = x[3] ~= 1 and 1 or 0
+function Frame.new(id, monitor, x, y)
+  local padding = Frame.padding or 0
+  local min = Vector.new(x[1], y[1])
+  local base = Vector.new(x[2], y[2])
+  local max = Vector.new(x[3], y[3])
+  local space = {
+    t = min.y ~= 0 and 1 or 0,
+    b = max.y ~= 1 and 1 or 0,
+    l = min.x ~= 0 and 1 or 0,
+    r = max.x ~= 1 and 1 or 0,
+  }
   return setmetatable({
     id = id,
-    monitor = monitorId,
-    box = Box.new(x[1], y[1], x[3], y[3]),
-    base = Vector.new(x[2], y[2]),
-    links = links,
-    latestWindow = nil,
+    monitor = monitor,
+    box = Box.new(monitor:map(min, padding), monitor:map(max, -padding)),
+    base = monitor:map(base, 0),
     scaler = Box.new(
-      l == r and -0.5 or l,
-      t == b and -0.5 or t,
-      l == r and 0.5 or r,
-      t == b and 0.5 or b),
+      Vector.new(space.l == space.r and -0.5 or space.l, space.t == space.b and -0.5 or space.t),
+      Vector.new(space.l == space.r and 0.5 or space.r, space.t == space.b and 0.5 or space.b)
+    ) * monitor:size(),
+    links = {},
   }, Frame.mt)
 end
 
-function Frame:populate(ms, padding)
-  if not ms[self.monitor] then
-    print("Unknown monitor " .. self.monitor)
-    return false
+function Frame:linkTo(other, dir, inverse)
+  self.links[dir] = other
+  if inverse or inverse == nil then
+    other.links[dir.inverse] = self
   end
-  local monitor = ms[self.monitor]
+end
 
-  local function mapWithOffset(vec, f)
-    local px = (vec.x == 0 or vec.x == 1) and 1 or 0.5
-    local py = (vec.y == 0 or vec.y == 1) and 1 or 0.5
-    return monitor:map(vec) + Vector.new(px, py) * f
+function Frame:traverseLinks(dir)
+  local todo = {self.links[dir]}
+  local done = {}
+  return function()
+    while next(todo) do
+      local frame = table.remove(todo, 1)
+      if frame and not done[frame.id] then
+        done[frame.id] = true
+        table.insert(todo, frame.links[dir])
+        for _, d in ipairs(dir.neighbors) do
+          table.insert(todo, frame.links[d])
+        end
+        return frame
+      end
+    end
   end
-
-  self.box.min = mapWithOffset(self.box.min, padding)
-  self.box.max = mapWithOffset(self.box.max, -padding)
-  self.base = monitor:map(self.base)
-  self.scaler = self.scaler * monitor.box:size()
-  return true
 end
 
 function Frame:tostring()
   return "Frame(" .. self.id .. ", box=" .. tostring(self.box) .. ", base=" .. tostring(self.base) .. ")"
 end
 
--- See keyhac/config.py
-function Frame.panel(h, v, e, monitor, x, y)
+function Frame.nearest(fs, pos)
+  local frame = nil
+  local distance = math.huge
+  for _, f in pairs(fs) do
+    local d = f.base:distanceTo(pos)
+    if d < distance then
+      frame = f
+      distance = d
+    end
+  end
+  return frame
+end
+
+function Frame.tile(idPrefix, monitor, xp, yp, fs)
   local function id(x, y)
-    return string.format("%s-%s-%s", monitor, x, y)
+    return string.format("%s-%s-%s", idPrefix, x, y)
   end
 
-  local dirs = {}
+  local outline = {}
+  outline[Direction.top] = {}
+  outline[Direction.bottom] = {}
+  outline[Direction.left] = {}
+  outline[Direction.right] = {}
 
-  if y == 1 then
-    dirs[Direction.top] = e[Direction.top]
-  else
-    dirs[Direction.top] = id(x, y - 1)
+  for y = 1, #yp do
+    for x = 1, #xp do
+      local frame = Frame.new(id(x, y), monitor, xp[x], yp[y])
+      fs[frame.id] = frame
+
+      if x ~= 1 then frame:linkTo(fs[id(x - 1, y)], Direction.left) end
+      if y ~= 1 then frame:linkTo(fs[id(x, y - 1)], Direction.top) end
+      if y == 1 then table.insert(outline[Direction.top], frame) end
+      if y == #yp then table.insert(outline[Direction.bottom], frame) end
+      if x == 1 then table.insert(outline[Direction.left], frame) end
+      if x == #xp then table.insert(outline[Direction.right], frame) end
+    end
   end
-
-  if y == #v then
-    dirs[Direction.bottom] = e[Direction.bottom]
-  else
-    dirs[Direction.bottom] = id(x, y + 1)
-  end
-
-  if x == 1 then
-    dirs[Direction.left] = e[Direction.left]
-  else
-    dirs[Direction.left] = id(x - 1, y)
-  end
-
-  if x == #h then
-    dirs[Direction.right] = e[Direction.right]
-  else
-    dirs[Direction.right] = id(x + 1, y)
-  end
-
-  return Frame.new(id(x, y), monitor, h[x], v[y], dirs)
+  return outline
 end
 
 function Frame.test()
-  local m = Monitor.new(1, Box.new(0, 0, 100, 100))
-  local a = Frame.new("a", m.id, {0, 0.25, 0.5}, {0, 0.5, 1}, {})
-  local b = Frame.new("b", m.id, {0.5, 0.75, 1}, {0, 0.5, 1}, {})
-  local ms = {[m.id] = m}
-  a:populate(ms, 6)
-  b:populate(ms, 6)
-  assert(a.box == Box.new(6, 6, 47, 94))
+  Frame.padding = 6
+  local m = Monitor.new(1, Box.box(0, 0, 100, 100))
+  local a = Frame.new("a", m, {0, 0.25, 0.5}, {0, 0.5, 1})
+  local b = Frame.new("b", m, {0.5, 0.75, 1}, {0, 0.5, 1})
+  assert(a.box == Box.box(6, 6, 47, 94))
   assert(a.base == Vector.new(25, 50))
-  assert(a.scaler == Box.new(0, -50, 100, 50))
-  assert(b.box == Box.new(53, 6, 94, 94))
+  assert(a.scaler == Box.box(0, -50, 100, 50))
+  assert(b.box == Box.box(53, 6, 94, 94))
   assert(b.base == Vector.new(75, 50))
-  assert(b.scaler == Box.new(100, -50, 0, 50))
+  assert(b.scaler == Box.box(100, -50, 0, 50))
+
+  Frame.padding = 0
+  m = Monitor.new(1, Box.box(0, 0, 400, 100))
+  local fs = {
+    a = Frame.new("a", m, {0,    0.125, 0.25}, {0, 0.5, 1}),
+    b = Frame.new("b", m, {0.25, 0.375, 0.5},  {0, 0.5, 1}),
+    c = Frame.new("c", m, {0.5,  0.625, 0.75}, {0, 0.5, 1}),
+    d = Frame.new("d", m, {0.75, 0.875, 1},    {0, 0.5, 1}),
+  }
+  fs.a:linkTo(fs.b, Direction.right)
+  fs.b:linkTo(fs.c, Direction.right)
+  fs.c:linkTo(fs.d, Direction.right)
+  assert(fs.a.links[Direction.right] == fs.b)
+  assert(fs.b.links[Direction.right] == fs.c)
+  assert(fs.b.links[Direction.left] == fs.a)
+  local t = fs.a:traverseLinks(Direction.right)
+  assert(t() == fs.b)
+  assert(t() == fs.c)
+  assert(t() == fs.d)
+  assert(t() == nil)
+  t = fs.b:traverseLinks(Direction.right)
+  assert(t() == fs.c)
+  assert(t() == fs.d)
+  assert(t() == nil)
+  t = fs.b:traverseLinks(Direction.left)
+  assert(t() == fs.a)
+  assert(t() == nil)
+  assert(Frame.nearest(fs, Vector.new(50, 50)) == fs.a)
+  assert(Frame.nearest(fs, Vector.new(250, 50)) == fs.c)
 end
 
 Frame.mt = {
@@ -347,133 +447,9 @@ Frame.mt = {
   __tostring = Frame.tostring,
 }
 
-FrameSet = {}
+window = {}
 
-function FrameSet.new()
-  return setmetatable({items = {}}, FrameSet.mt)
-end
-
-function FrameSet:register(frame)
-  self.items[frame.id] = frame
-end
-
-function FrameSet:get(frameId)
-  return self.items[frameId]
-end
-
-function FrameSet:getNearest(pos)
-  local nf = nil
-  local nfd = math.huge
-  for _, f in pairs(self.items) do
-    local fd = f.base:distanceTo(pos)
-    if fd < nfd then
-      nf = f
-      nfd = fd
-    end
-  end
-  return nf
-end
-
-function FrameSet:getByDirection(baseFrame, dir)
-  local frameId = baseFrame.links[dir]
-  return frameId and self.items[frameId] or nil
-end
-
-function FrameSet:getByWindow(win, saveLatest)
-  local box = Box.fromRect(win:frame())
-  local frame = self:getNearest(box:center())
-  if saveLatest or saveLatest == nil then
-    frame.latestWindow = win:id()
-  end
-  return frame
-end
-
-function FrameSet:enumerateByDirection(baseFrame, dir)
-  local visitOrder = dir:visitOrder()
-  local todo = {self:getByDirection(baseFrame, dir)}
-  local done = {}
-  local ret = {}
-  while next(todo) do
-    local f = table.remove(todo, 1)
-    if f and not done[f.id] then
-      done[f.id] = true
-      table.insert(ret, f)
-      for _, d in ipairs(visitOrder) do
-        table.insert(todo, self:getByDirection(f, d))
-      end
-    end
-  end
-  return ret
-end
-
-function FrameSet:populate(ms, padding)
-  local missingFrames = {}
-  for _, frame in pairs(self.items) do
-    for _, frameId in pairs(frame.links) do
-      if not self:get(frameId) then
-        error("Unknown frame " .. frameId)
-      end
-    end
-    if not frame:populate(ms, padding) then
-      missingFrames[frame.id] = true
-    end
-  end
-
-  for missingFrameId, _ in pairs(missingFrames) do
-    self.items[missingFrameId] = nil
-  end
-
-  for _, frame in pairs(self.items) do
-    local missingLinks = {}
-    for dir, frameId in pairs(frame.links) do
-      if missingFrames[frameId] then
-        missingLinks[dir] = true
-      end
-    end
-    for dir, _ in pairs(missingLinks) do
-      frame.links[dir] = nil
-    end
-  end
-end
-
-function FrameSet:initialize(frames)
-  for _, frame in ipairs(frames) do
-    self:register(frame)
-  end
-end
-
-function FrameSet.test()
-  local m = Monitor.new(1, Box.new(0, 0, 400, 100))
-  local a = Frame.new("a", m.id, {0,    0.125, 0.25}, {0, 0.5, 1}, {[Direction.right] = "b"})
-  local b = Frame.new("b", m.id, {0.25, 0.375, 0.5},  {0, 0.5, 1}, {[Direction.left] = "a", [Direction.right] = "c"})
-  local c = Frame.new("c", m.id, {0.5,  0.625, 0.75}, {0, 0.5, 1}, {[Direction.left] = "b", [Direction.right] = "d"})
-  local d = Frame.new("d", m.id, {0.75, 0.875, 1},    {0, 0.5, 1}, {[Direction.left] = "c"})
-  local ms = {[m.id] = m}
-  local fs = FrameSet.new()
-  fs:initialize({a, b, c, d})
-  fs:populate(ms, 0)
-  assert(fs:getNearest(Vector.new(50, 50)) == a)
-  assert(fs:getNearest(Vector.new(250, 50)) == c)
-  assert(fs:getByDirection(a, Direction.right) == b)
-  assert(fs:getByDirection(b, Direction.right) == c)
-  assert(fs:getByDirection(b, Direction.left) == a)
-  assert(fs:getByDirection(b, Direction.top) == nil)
-  assert(fs:enumerateByDirection(a, Direction.right)[1] == b)
-  assert(fs:enumerateByDirection(a, Direction.right)[2] == c)
-  assert(fs:enumerateByDirection(a, Direction.right)[3] == d)
-  assert(fs:enumerateByDirection(a, Direction.right)[4] == nil)
-  assert(fs:enumerateByDirection(b, Direction.right)[1] == c)
-  assert(fs:enumerateByDirection(b, Direction.right)[2] == d)
-  assert(fs:enumerateByDirection(b, Direction.right)[3] == nil)
-  assert(fs:enumerateByDirection(b, Direction.left)[1] == a)
-  assert(fs:enumerateByDirection(b, Direction.left)[2] == nil)
-end
-
-FrameSet.mt = {__index = FrameSet}
-
-operation = {}
-
-function operation.getWindows(cond)
+function window.list(cond)
   local wins = hs.fnutils.filter(hs.window.visibleWindows(), function(win)
     return win:isStandard() and (not cond or cond(win))
   end)
@@ -481,112 +457,103 @@ function operation.getWindows(cond)
   return wins
 end
 
-function operation.getWindowsInFrame(fs, frame)
-  return operation.getWindows(function(win)
+function window.listInFrame(fs, frame)
+  return window.list(function(win)
     local box = Box.fromRect(win:frame())
-    local f = fs:getNearest(box:center())
-    return frame == f
+    return frame == Frame.nearest(fs, box:center())
   end)
 end
 
-function operation.getCurrentWindow()
+function window.current()
   local win = hs.window.focusedWindow()
   return win and win:isStandard() and win or nil
 end
 
-function operation.closeWindow()
-  local win = operation.getCurrentWindow()
-  if win then
-    win:close()
-  end
+function window.frame(fs, win)
+  local box = Box.fromRect(win:frame())
+  local frame = Frame.nearest(fs, box:center())
+  frame.latestWin = win:id()
+  return frame
+end
+
+function window.close()
+  local win = window.current()
+  if win then win:close() end
 end
 
 do
   local stashedWindowRect = {}
   local maximizeThreshold = 20
 
-  function operation.toggleMaximizeWindow()
-    local win = operation.getCurrentWindow()
-    if win then
-      local id = win:id()
-      local f = win:frame()
-      local sf = win:screen():frame()
+  function window.toggleMaximize()
+    local win = window.current()
+    if not win then return end
 
-      if stashedWindowRect[id]
-      and math.abs(sf.x - f.x) < maximizeThreshold
-      and math.abs(sf.y - f.y) < maximizeThreshold
-      and math.abs(sf.w - f.w) < maximizeThreshold
-      and math.abs(sf.h - f.h) < maximizeThreshold
-      then
-        win:setFrame(stashedWindowRect[id])
-        stashedWindowRect[id] = nil
-      else
-        stashedWindowRect[id] = f
-        win:setFrame(sf)
-      end
+    local id = win:id()
+    local f = win:frame()
+    local sf = win:screen():frame()
+
+    if stashedWindowRect[id]
+    and math.abs(sf.x - f.x) < maximizeThreshold
+    and math.abs(sf.y - f.y) < maximizeThreshold
+    and math.abs(sf.w - f.w) < maximizeThreshold
+    and math.abs(sf.h - f.h) < maximizeThreshold
+    then
+      win:setFrame(stashedWindowRect[id])
+      stashedWindowRect[id] = nil
+    else
+      stashedWindowRect[id] = f
+      win:setFrame(sf)
     end
   end
 end
 
-function operation.focusSomeWindow(fs)
-  for _, win in pairs(operation.getWindows()) do
+function window.focusAny(fs)
+  for _, win in pairs(window.list()) do
     win:focus()
-    operation.alertWindows(operation.getWindowsInFrame(fs, fs:getByWindow(win)))
     return true
   end
   return false
 end
 
-function operation.focusFrameByDirection(fs, dir, baseFrame)
-  if not baseFrame then
-    local win = operation.getCurrentWindow()
-    if not win then
-      return operation.focusSomeWindow(fs)
-    end
-    baseFrame = fs:getByWindow(win)
-  end
+function window.focusByDirection(fs, dir)
+  local win = window.current()
+  if not win then return window.focusAny(fs) end
 
-  for _, nextFrame in ipairs(fs:enumerateByDirection(baseFrame, dir)) do
-    if operation.focusWindowInFrame(fs, 0, nextFrame) then
-      return true
-    end
+  for frame in window.frame(fs, win):traverseLinks(dir) do
+    if window.focusByFrame(fs, frame) then return true end
   end
   return false
 end
 
-function operation.focusByApplication(fs, app)
-  local wins = operation.getWindows(function(win)
-    return win:application():path():find(app)
-  end)
+function window.focusByFrame(fs, frame, offset)
+  if not frame then
+    local win = window.current()
+    if not win then return window.focusAny(fs) end
+
+    frame = window.frame(fs, win)
+  end
+
+  local wins = window.listInFrame(fs, frame)
+  if not wins or not next(wins) then return false end
+
+  return window.focusInOrder(fs, wins, offset or 0, frame.latestWin)
+end
+
+function window.focusByApplication(fs, app, offset)
+  local wins = window.list(function(win) return win:application():path():find(app) end)
 
   if not wins or not next(wins) then
     hs.applescript.applescript([[do shell script "/usr/bin/open -a ']] .. app .. [['"]])
     return true
   end
 
-  return operation.focusWindowInRotation(fs, wins, 1)
+  return window.focusInOrder(fs, wins, offset or 1)
 end
 
-function operation.focusWindowInFrame(fs, offset, baseFrame)
-  if not baseFrame then
-    local win = operation.getCurrentWindow()
-    if not win then
-      return operation.focusSomeWindow(fs)
-    end
-    baseFrame = fs:getByWindow(win)
-  end
-
-  local frameWins = operation.getWindowsInFrame(fs, baseFrame)
-  if not frameWins or not next(frameWins) then
-    return false
-  end
-
-  return operation.focusWindowInRotation(fs, frameWins, offset, baseFrame.latestWindow)
-end
-
-function operation.focusWindowInRotation(fs, wins, offset, latest)
+function window.focusInOrder(fs, wins, offset, latestWin)
   local index = nil
-  local current = operation.getCurrentWindow()
+  local current = window.current()
   for i, w in ipairs(wins) do
     if w == current then
       index = i
@@ -594,81 +561,68 @@ function operation.focusWindowInRotation(fs, wins, offset, latest)
     end
   end
 
-  if not index and latest then
+  if not index and latestWin then
     for i, w in ipairs(wins) do
-      if w:id() == latest then
+      if w:id() == latestWin then
         index = i
         break
       end
     end
   end
 
-  if not index then
-    index = 1
+  if not index then index = 1 end
+
+  local current = wins[((#wins + index + offset - 1) % #wins) + 1]
+  current:focus()
+
+  -- Report orders by hs.alert for convenience
+  do
+    local apps = {}
+    for _, win in pairs(wins) do
+      local app = win:application():title()
+      apps[app] = 1 + (apps[app] or 0)
+    end
+
+    local messages = {}
+    for _, win in pairs(wins) do
+      local prefix = win == current and "◆ " or "◇ "
+      local app = win:application():title()
+      local title = 1 < apps[app] and app .. " (" .. utf8.sub(win:title(), 0, 30) .. ")" or app
+      table.insert(messages, prefix .. title)
+    end
+    hs.alert.closeAll()
+    hs.alert.show(table.concat(messages, "\n"), 1)
   end
 
-  local nextWin = wins[((#wins + index + offset - 1) % #wins) + 1]
-  nextWin:focus()
-  fs:getByWindow(nextWin) -- save latest window
-  operation.alertWindows(wins)
   return true
 end
 
-function operation.moveWindowByDirection(fs, dir)
-  local win = operation.getCurrentWindow()
-  if not win then
-    return
-  end
-  local frame = fs:getByWindow(win)
-  local nextFrame = fs:getByDirection(frame, dir)
-  if nextFrame then
-    win:setFrame(nextFrame.box:rect())
-    operation.alertWindows(operation.getWindowsInFrame(fs, nextFrame))
-  else
-    win:setFrame(frame.box:rect())
-  end
-end
+function window.moveByDirection(fs, dir)
+  local win = window.current()
+  if not win then return end
 
-function operation.resetWindowSize(fs)
-  local win = operation.getCurrentWindow()
-  if not win then
-    return
-  end
-  local frame = fs:getByWindow(win)
+  local frame = window.frame(fs, win)
+  frame = frame.links[dir] or frame
   win:setFrame(frame.box:rect())
 end
 
-function operation.resizeWindowByDirection(fs, dir, l)
-  local win = operation.getCurrentWindow()
-  if not win then
-    return
-  end
-  local box = Box.fromRect(win:frame())
-  local frame = fs:getByWindow(win)
-  box.min.x = box.min.x + dir.vector.x * frame.scaler.min.x * l
-  box.min.y = box.min.y + dir.vector.y * frame.scaler.min.y * l
-  box.max.x = box.max.x + dir.vector.x * frame.scaler.max.x * l
-  box.max.y = box.max.y + dir.vector.y * frame.scaler.max.y * l
-  win:setFrame(box:rect())
+function window.resetSize(fs)
+  local win = window.current()
+  if not win then return end
+
+  local frame = window.frame(fs, win)
+  win:setFrame(frame.box:rect())
 end
 
-function operation.alertWindows(wins)
-  local apps = {}
-  for _, win in pairs(wins) do
-    local app = win:application():title()
-    apps[app] = 1 + (apps[app] or 0)
-  end
+function window.resizeByDirection(fs, dir, l)
+  local win = window.current()
+  if not win then return end
 
-  local current = operation.getCurrentWindow()
-  local messages = {}
-  for _, win in pairs(wins) do
-    local prefix = win == current and "◆ " or "◇ "
-    local app = win:application():title()
-    local title = 1 < apps[app] and app .. " (" .. utf8.sub(win:title(), 0, 30) .. ")" or app
-    table.insert(messages, prefix .. title)
-  end
-  hs.alert.closeAll()
-  hs.alert.show(table.concat(messages, "\n"), 1)
+  local box = Box.fromRect(win:frame())
+  local frame = window.frame(fs, win)
+  box.min = box.min + dir.vector * frame.scaler.min * l
+  box.max = box.max + dir.vector * frame.scaler.max * l
+  win:setFrame(box:rect())
 end
 
 function utf8.sub(s, i, j)
