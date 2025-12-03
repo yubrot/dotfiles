@@ -14,13 +14,13 @@ function init()
     for i, screen in ipairs(hs.screen.allScreens()) do
       ms[i] = Monitor.new(i, Box.fromRect(screen:frame()))
     end
-    ms.primary = Monitor.primary(ms)
-    ms.secondaries = hs.fnutils.filter(ms, function(m) return m ~= ms.primary end)
+    ms.main = Monitor.primary(ms)
+    ms.subs = hs.fnutils.filter(ms, function(m) return m ~= ms.main end)
   end
 
   local fs = {}
   do
-    local layout = ms.primary:size().x >= 2560 and {
+    local layout = ms.main:size().x >= 2560 and {
       xp = {{0, 0.125, 0.25}, {0.25, 0.5, 0.75}, {0.75, 0.875, 1}},
       yp = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}},
     } or {
@@ -28,12 +28,12 @@ function init()
       yp = {{0, 0.25, 0.5}, {0, 0.5, 1}, {0.5, 0.75, 1}},
     }
 
-    local main = Frame.tile("primary", ms.primary, layout.xp, layout.yp, fs)
-    for _, m in pairs(ms.secondaries) do
+    local main = Frame.tile("main", ms.main, layout.xp, layout.yp, fs)
+    for _, m in pairs(ms.subs) do
       local sub = Frame.new(string.format("sub-%s", m.id), m, {0, 0.5, 1}, {0, 0.5, 1})
       fs[sub.id] = sub
 
-      local dir = ms.primary:center():directionTo(m:center())
+      local dir = (m:center() - ms.main:center()):direction()
       local side = main[dir]
       for i, f in ipairs(side) do
         f:linkTo(sub, dir, i == math.ceil(#side / 2))
@@ -121,14 +121,6 @@ function Vector:direction()
   end
 end
 
-function Vector:distanceTo(other)
-  return (other - self):scalar()
-end
-
-function Vector:directionTo(other)
-  return (other - self):direction()
-end
-
 function Vector:tostring()
   return "(" .. self.x .. ", " .. self.y .. ")"
 end
@@ -143,8 +135,6 @@ function Vector.test()
   assert(Vector.new(3, 5) * Vector.new(3, 4) == Vector.new(9, 20))
   assert(Vector.new(3, 4):scalar() == 5)
   assert(Vector.new(1, -3):direction() == Direction.top)
-  assert(Vector.new(3, 5):distanceTo(Vector.new(7, 2)) == 5)
-  assert(Vector.new(3, 5):directionTo(Vector.new(-4, 4)) == Direction.left)
 end
 
 Vector.mt = {
@@ -377,7 +367,7 @@ function Frame.nearest(fs, pos)
   local frame = nil
   local distance = math.huge
   for _, f in pairs(fs) do
-    local d = f.base:distanceTo(pos)
+    local d = (pos - f.base):scalar()
     if d < distance then
       frame = f
       distance = d
