@@ -26,7 +26,9 @@ require("lazy").setup({
   { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
   { "willothy/nvim-cokeline", dependencies = { "nvim-tree/nvim-web-devicons" } },
   { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
-  { "sustech-data/wildfire.nvim", dependencies = { "nvim-treesitter/nvim-treesitter" } },
+  { "nvim-treesitter/nvim-treesitter", branch = 'master', lazy = false, build = ":TSUpdate" },
+  { "nvim-treesitter/nvim-treesitter-textobjects", dependencies = { "nvim-treesitter/nvim-treesitter" } },
+  { "sustech-data/wildfire.nvim", event = "VeryLazy", dependencies = { "nvim-treesitter/nvim-treesitter" } },
 })
 
 -- UI
@@ -70,7 +72,29 @@ require("dial.config").augends:register_group{
 
 -- Keymaps
 require("substitute").setup()
-require("nvim-surround").setup()
+require("nvim-treesitter.configs").setup {
+  textobjects = {
+    select = {
+      enable = true,
+      keymaps = {
+        ["ad"] = "@block.outer",
+        ["id"] = "@block.inner",
+      }
+    }
+  }
+}
+require("nvim-surround").setup {
+  surrounds = {
+    ["d"] = {
+      add = { "do", "end" },
+      find = function()
+        local config = require("nvim-surround.config")
+        return config.get_selection({ motion = "ad" })
+      end,
+      delete = "^(do ?)().-( ?end)()$",
+    }
+  }
+}
 require("wildfire").setup()
 vim.keymap.set({"n", "v"}, "j", "gj", { noremap = true })
 vim.keymap.set({"n", "v"}, "k", "gk", { noremap = true })
@@ -109,4 +133,19 @@ else
   vim.keymap.set("n", "H", "<Cmd>bp<CR>")
   vim.keymap.set("n", "L", "<Cmd>bn<CR>")
 end
+
+-- It's unclear why, but tree-sitter-ruby requires an explicit `parse` call at least once.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "ruby",
+  callback = function()
+    local node = vim.treesitter.get_node()
+    if node then return end
+
+    local buf = vim.api.nvim_get_current_buf()
+    local ok, parser = pcall(vim.treesitter.get_parser, buf)
+    if not ok or not parser then return end
+
+    parser:parse()
+  end
+})
 
