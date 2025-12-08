@@ -86,7 +86,7 @@ require("nvim-treesitter.configs").setup {
 require("nvim-surround").setup {
   surrounds = {
     ["d"] = {
-      add = { "do", "end" },
+      add = { "do ", " end" },
       find = function()
         local config = require("nvim-surround.config")
         return config.get_selection({ motion = "ad" })
