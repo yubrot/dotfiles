@@ -21,7 +21,7 @@ def configure(keymap: Any) -> None:
         layout_xp = [(0, 0.125, 0.25), (0.25, 0.5, 0.75), (0.75, 0.875, 1)]
         layout_yp = [(0, 0.25, 0.5), (0, 0.5, 1), (0.5, 0.75, 1)]
     else:
-        layout_xp = [(0, 0.3, 0.6), (0.6, 0.8, 1)]
+        layout_xp = [(0, 0.35, 0.7), (0.5, 0.75, 1)]
         layout_yp = [(0, 0.25, 0.5), (0, 0.5, 1), (0.5, 0.75, 1)]
 
     main_frame = Frame.tile("main", main_monitor, layout_xp, layout_yp, fs)
