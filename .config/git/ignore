@@ -1,9 +1,5 @@
 .DS_Store
 *~
-mise.local.toml
-.mbin
 .vscode
-.claude/settings.local.json
-CLAUDE.local.md
-
+mise.local.toml
 **/.claude/settings.local.json
