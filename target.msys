@@ -4,4 +4,6 @@
 .config/git/ignore
 .config/nvim/init.lua
 .config/starship.toml
+.local/bin/git-topic
+.local/bin/git-ls-topic
 AppData/Roaming/keyhac/config.py

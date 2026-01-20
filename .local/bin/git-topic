@@ -1,0 +1,28 @@
+#!/bin/bash
+
+GIT_DIR=$(git rev-parse --git-common-dir)
+if [ $? -ne 0 ]; then
+  echo "Error: Not in a git repository"
+  exit 1
+fi
+
+if [ -z "$1" ]; then
+  echo "Usage: git topic <branch-name> [-c]"
+  exit 1
+fi
+
+BRANCH_NAME=$1
+TARGET_DIR="$(cd "$GIT_DIR/.." && pwd)/.git/topics/$BRANCH_NAME"
+
+
+if git rev-parse --verify "$BRANCH_NAME" >/dev/null 2>&1 || \
+    git rev-parse --verify "origin/$BRANCH_NAME" >/dev/null 2>&1; then
+  # existing branch
+  git worktree add "$TARGET_DIR" "$BRANCH_NAME"
+elif [ "$2" == "-c" ]; then
+  # -c: continue from current branch
+  git worktree add -b "$BRANCH_NAME" "$TARGET_DIR"
+else
+  # clean branch
+  git worktree add -b "$BRANCH_NAME" "$TARGET_DIR" origin/main
+fi

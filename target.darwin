@@ -10,3 +10,5 @@
 .config/pycodestyle
 .config/starship.toml
 .config/tmux/tmux.conf
+.local/bin/git-topic
+.local/bin/git-ls-topic

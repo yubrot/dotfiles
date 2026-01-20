@@ -102,10 +102,17 @@ chpwd() {
   s
 }
 
+# cd to git root
 cdr() {
   builtin cd $(git rev-parse --show-toplevel)
 }
 
+# cd to git root (leaves worktree)
+cdrr() {
+  builtin cd $(git rev-parse --git-common-dir)/..
+}
+
+# [v]im + [f]d fzf
 vf() {
   v $(fd -t f | eval $(grep_and "$@") | f -0 -1 -m)
 }
@@ -114,6 +121,7 @@ vfa() {
   v $(fd -H -t f | eval $(grep_and "$@") | f -0 -1 -m)
 }
 
+# [c]d + [f]d fzf
 cf() {
   builtin cd $(fd -t d | eval $(grep_and "$@") | f -0 -1)
 }
@@ -122,15 +130,28 @@ cfa() {
   builtin cd $(fd -H -t d | eval $(grep_and "$@") | f -0 -1)
 }
 
+# [c]d + gh[q] list fzf
 cq() {
   builtin cd $(q list -p | eval $(grep_and "$@") | f -0 -1)
 }
 
-gf() {
+# [c]d + git ls-[t]opic fzf
+ct() {
+  builtin cd $(g ls-topic | eval $(grep_and "$@") | f -0 -1)
+}
+
+# [c]d + [g]it [t]opic
+cgt() {
+  g t "$@"
+  cd "$(git rev-parse --git-common-dir)/topics/$1"
+}
+
+# [g]it checkout + git [b]ranch fzf
+gb() {
   g co $(g b | eval $(grep_and "$@") | f -0 -1)
 }
 
-gfr() {
+gbr() {
   g co $(g b -r | eval $(grep_and "$@") | f -0 -1)
 }
 
