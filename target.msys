@@ -6,4 +6,5 @@
 .config/starship.toml
 .local/bin/git-topic
 .local/bin/git-ls-topic
+.local/bin/git-pls
 AppData/Roaming/keyhac/config.py

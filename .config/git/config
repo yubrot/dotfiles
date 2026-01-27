@@ -31,10 +31,12 @@
   b = branch
   c = commit
   t = topic
+  w = worktree
+  wp = worktree prune
+  wl = worktree list
   co = checkout
   ps = push -u
   pl = pull --prune
-  pls = "!git stash; git pl; git stash pop"
   f = fetch --prune
   fu = fetch --prune upstream
   rg = grep --line-number --show-function --color --heading --break
