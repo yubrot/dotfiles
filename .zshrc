@@ -114,30 +114,36 @@ cdrr() {
 
 # [v]im + [f]d fzf
 vf() {
-  v $(fd -t f | eval $(grep_and "$@") | f -0 -1 -m)
+  local files=$(fd -t f | eval $(grep_and "$@") | f -0 -1 -m)
+  [ -n "$files" ] && v $files
 }
 
 vfa() {
-  v $(fd -H -t f | eval $(grep_and "$@") | f -0 -1 -m)
+  local files=$(fd -H -t f | eval $(grep_and "$@") | f -0 -1 -m)
+  [ -n "$files" ] && v $files
 }
 
 # [c]d + [f]d fzf
 cf() {
-  builtin cd $(fd -t d | eval $(grep_and "$@") | f -0 -1)
+  local dest=$(fd -t d | eval $(grep_and "$@") | f -0 -1)
+  [ -n "$dest" ] && builtin cd "$dest"
 }
 
 cfa() {
-  builtin cd $(fd -H -t d | eval $(grep_and "$@") | f -0 -1)
+  local dest=$(fd -H -t d | eval $(grep_and "$@") | f -0 -1)
+  [ -n "$dest" ] && builtin cd "$dest"
 }
 
 # [c]d + gh[q] list fzf
 cq() {
-  builtin cd $(q list -p | eval $(grep_and "$@") | f -0 -1)
+  local dest=$(q list -p | eval $(grep_and "$@") | f -0 -1)
+  [ -n "$dest" ] && builtin cd "$dest"
 }
 
 # [c]d + git ls-[t]opic fzf
 ct() {
-  builtin cd $(g ls-topic | eval $(grep_and "$@") | f -0 -1)
+  local dest=$(g ls-topic | eval $(grep_and "$@") | f -0 -1)
+  [ -n "$dest" ] && builtin cd "$dest"
 }
 
 # [c]d + [g]it [t]opic
@@ -148,11 +154,13 @@ cgt() {
 
 # [g]it checkout + git [b]ranch fzf
 gb() {
-  g co $(g b | eval $(grep_and "$@") | f -0 -1)
+  local branch=$(g b | eval $(grep_and "$@") | f -0 -1)
+  [ -n "$branch" ] && g co "$branch"
 }
 
 gbr() {
-  g co $(g b -r | eval $(grep_and "$@") | f -0 -1)
+  local branch=$(g b -r | eval $(grep_and "$@") | f -0 -1)
+  [ -n "$branch" ] && g co "$branch"
 }
 
 grep_and() {
