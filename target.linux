@@ -7,6 +7,7 @@
 .config/pycodestyle
 .config/starship.toml
 .config/tmux/tmux.conf
+.config/ccstatusline/settings.json
 .local/bin/git-topic
 .local/bin/git-ls-topic
 .local/bin/git-pls

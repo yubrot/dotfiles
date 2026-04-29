@@ -4,6 +4,7 @@
 .config/git/ignore
 .config/nvim/init.lua
 .config/starship.toml
+.config/ccstatusline/settings.json
 .local/bin/git-topic
 .local/bin/git-ls-topic
 .local/bin/git-pls
