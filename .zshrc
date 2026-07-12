@@ -94,11 +94,13 @@ alias f='fzf'
 alias g='git'
 alias gg='lazygit'
 alias q='ghq'
+alias h='herdr'
 alias lss='ls -lh'
 alias mkdir='mkdir -p'
 alias zip='zip -r'
 
 chpwd() {
+  [[ -n "$CLAUDECODE" ]] && return
   s
 }
 
@@ -163,6 +165,32 @@ gbr() {
   [ -n "$branch" ] && g co "$branch"
 }
 
+# [aws] [p]rofile fzf
+awsp() {
+  local profile
+
+  profile=$(
+    {
+      echo '(clear)'
+      aws configure list-profiles
+    } | fzf --height 40% --reverse --prompt='AWS_PROFILE> ' --query="${AWS_PROFILE:-}"
+  ) || return
+
+  case "$profile" in
+  '(clear)')
+    unset AWS_PROFILE
+    echo 'AWS_PROFILE cleared'
+    ;;
+  '')
+    return
+    ;;
+  *)
+    export AWS_PROFILE="$profile"
+    echo "AWS_PROFILE=$AWS_PROFILE"
+    ;;
+  esac
+}
+
 grep_and() {
   local cmd="cat -"
   for v in "$@"; do
@@ -200,4 +228,3 @@ export GOPATH=$HOME/.go
 # -----------------------
 
 eval "$(starship init zsh)"
-

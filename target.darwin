@@ -5,6 +5,7 @@
 .config/bat/config
 .config/git/config
 .config/git/ignore
+.config/herdr/config.toml
 .config/nvim/init.lua
 .config/ocaml/init.ml
 .config/pycodestyle
