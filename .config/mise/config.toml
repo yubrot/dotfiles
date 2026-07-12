@@ -1,0 +1,9 @@
+[settings]
+trusted_config_paths = [
+  "~/in/github.com/yubrot",
+]
+
+[tools]
+bun = "latest"
+go = "latest"
+node = "latest"
