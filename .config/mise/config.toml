@@ -3,7 +3,16 @@ trusted_config_paths = [
   "~/in/github.com/yubrot",
 ]
 
+[settings.ruby]
+compile = false
+
+[settings.github]
+use_git_credentials = true
+
 [tools]
-bun = "latest"
 go = "latest"
+ruby = "latest"
 node = "latest"
+deno = "latest"
+bun = "latest"
+terraform = "latest"

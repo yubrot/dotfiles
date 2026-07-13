@@ -1,5 +1,10 @@
+onboarding = false
+
 [keys]
 prefix = "ctrl+space"
+new_tab = "ctrl+t"
+previous_tab = "ctrl+h"
+next_tab = "ctrl+l"
 
 [experimental]
 switch_ascii_input_source_in_prefix = true
