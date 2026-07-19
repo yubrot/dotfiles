@@ -18,6 +18,10 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+-- Let nvim-tree handle directory buffers instead of the built-in netrw.
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 require("lazy").setup({
   "EdenEast/nightfox.nvim",
   "gbprod/substitute.nvim",
@@ -25,6 +29,41 @@ require("lazy").setup({
   { "kylechui/nvim-surround", version = "*" },
   { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
   { "willothy/nvim-cokeline", dependencies = { "nvim-tree/nvim-web-devicons" } },
+  {
+    "nvim-tree/nvim-tree.lua",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    cmd = { "NvimTreeOpen", "NvimTreeClose" },
+    keys = {
+      {
+        "<leader>e",
+        function()
+          local tree_was_focused = vim.bo.filetype == "NvimTree"
+          require("nvim-tree.api").tree.open()
+          if tree_was_focused then vim.cmd("wincmd p") end
+        end,
+        desc = "Open nvim-tree / focus editor",
+      },
+      { "<leader>E", "<Cmd>NvimTreeClose<CR>", desc = "Close nvim-tree" },
+    },
+    opts = {
+      view = { side = "left", width = 60 },
+      renderer = {
+        group_empty = true,
+        highlight_git = "all",
+        icons = {
+          git_placement = "right_align",
+          glyphs = { git = { unstaged = "○" } },
+        },
+        root_folder_label = function(path)
+          local parts = vim.split(vim.fs.normalize(path), "/", { plain = true, trimempty = true })
+          return table.concat(vim.list_slice(parts, math.max(1, #parts - 2)), "/")
+        end,
+      },
+      git = { enable = true },
+      diagnostics = { enable = true },
+      update_focused_file = { enable = true, update_root = false },
+    },
+  },
   { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   { "nvim-treesitter/nvim-treesitter", branch = 'master', lazy = false, build = ":TSUpdate" },
   { "nvim-treesitter/nvim-treesitter-textobjects", dependencies = { "nvim-treesitter/nvim-treesitter" } },
@@ -43,7 +82,30 @@ if not vim.g.vscode then
   vim.opt.termguicolors = true
   vim.cmd("colorscheme duskfox")
   require("lualine").setup()
-  require("cokeline").setup()
+  require("cokeline").setup({
+    components = {
+      {
+        text = function(buffer) return " " .. buffer.devicon.icon end,
+        fg = function(buffer) return buffer.devicon.color end,
+      },
+      {
+        text = function(buffer)
+          if buffer.path == "" then return " " .. buffer.filename end
+          local parent = vim.fn.fnamemodify(buffer.path, ":h:t")
+          return (" %s/%s"):format(parent, buffer.filename)
+        end,
+        underline = function(buffer) return buffer.is_hovered and not buffer.is_focused end,
+        truncation = { direction = "left" },
+      },
+      {
+        text = function(buffer)
+          if buffer.is_modified then return "*" end
+          return ""
+        end,
+      },
+      { text = " " },
+    },
+  })
 end
 
 -- Behavior
@@ -114,6 +176,7 @@ vim.keymap.set({"n", "v"}, "<leader>j", "10j", { noremap = true })
 vim.keymap.set({"n", "v"}, "<leader>k", "10k", { noremap = true })
 vim.keymap.set("n", "<leader>/", "<Cmd>nohl<CR>")
 vim.keymap.set("v", "<leader>y", "\"*y", { noremap = true })
+
 if vim.g.vscode then
   vim.keymap.set("n", "<leader>p", "<Cmd>call VSCodeNotify('workbench.action.showCommands')<CR>")
   vim.keymap.set("n", "<leader>o", "<Cmd>call VSCodeNotify('workbench.action.quickOpen')<CR>")
@@ -126,8 +189,8 @@ else
   vim.keymap.set("n", "<leader>p", "\"*p", { noremap = true })
   vim.keymap.set("n", "<leader>o", function() require("telescope.builtin").find_files { hidden = true } end)
   vim.keymap.set("n", "<leader>r", function() require("telescope.builtin").live_grep { hidden = true } end)
-  vim.keymap.set("n", "<leader>d", "<Cmd>bd<CR>")
-  vim.keymap.set("n", "<leader>D", "<Cmd>bd!<CR>")
+  vim.keymap.set("n", "<leader>d", "<Cmd>bp | bd #<CR>")
+  vim.keymap.set("n", "<leader>D", "<Cmd>bp | bd! #<CR>")
   vim.keymap.set("n", "<leader>t", "<Cmd>tabnew<CR>")
   vim.keymap.set("n", "<leader>w", "<Cmd>w<CR>")
   vim.keymap.set("n", "H", "<Cmd>bp<CR>")
@@ -148,4 +211,3 @@ vim.api.nvim_create_autocmd("FileType", {
     parser:parse()
   end
 })
-
