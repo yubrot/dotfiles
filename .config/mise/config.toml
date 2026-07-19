@@ -2,6 +2,7 @@
 trusted_config_paths = [
   "~/in/github.com/yubrot",
 ]
+experimental = true
 
 [settings.ruby]
 compile = false
