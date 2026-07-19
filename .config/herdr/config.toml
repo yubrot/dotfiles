@@ -2,9 +2,13 @@ onboarding = false
 
 [keys]
 prefix = "ctrl+space"
-new_tab = "ctrl+t"
-previous_tab = "ctrl+h"
-next_tab = "ctrl+l"
+new_tab = "ctrl+t"         # from prefix+c
+previous_tab = "ctrl+h"    # from prefix+p
+next_tab = "ctrl+l"        # from prefix+n
+new_workspace = "prefix+c" # from prefix+N
+previous_workspace = "prefix+p"
+next_workspace = "prefix+n"
+edit_scrollback = ""
 
 [experimental]
 switch_ascii_input_source_in_prefix = true
@@ -13,3 +17,14 @@ cjk_ime_agents = ["claude", "codex"]
 
 [ui]
 agent_panel_sort = "spaces"
+
+[[keys.command]]
+key = "prefix+shift+g"
+type = "pane"
+command = "lazygit"
+
+[[keys.command]]
+key = "prefix+e"
+type = "shell"
+command = "herdr-editor-toggle"
+description = "Toggle workspace editor"

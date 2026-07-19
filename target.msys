@@ -10,4 +10,5 @@
 .local/bin/git-topic
 .local/bin/git-ls-topic
 .local/bin/git-pls
+.local/bin/herdr-editor-toggle
 AppData/Roaming/keyhac/config.py

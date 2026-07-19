@@ -1,0 +1,100 @@
+#!/bin/sh
+
+set -u
+umask 077
+
+herdr_bin="${HERDR_BIN_PATH:-herdr}"
+workspace="${HERDR_ACTIVE_WORKSPACE_ID:-}"
+current_tab="${HERDR_ACTIVE_TAB_ID:-}"
+
+if [ -z "$workspace" ] || [ -z "$current_tab" ]; then
+  printf '%s\n' 'herdr-editor-toggle: run this from a Herdr pane' >&2
+  exit 1
+fi
+
+state_dir="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/herdr-editor-tabs"
+state_file="$state_dir/$workspace"
+
+mkdir -p "$state_dir"
+
+tabs() {
+  "$herdr_bin" tab list --workspace "$workspace"
+}
+
+editor_tab() {
+  tabs | jq -r --arg workspace "$workspace" '
+    .result.tabs[]?
+    | select(.workspace_id == $workspace and .label == "EDITOR")
+    | .tab_id
+  ' | sed -n '1p'
+}
+
+tab_exists() {
+  tabs | jq -e --arg workspace "$workspace" --arg tab "$1" '
+    .result.tabs[]?
+    | select(.workspace_id == $workspace and .tab_id == $tab)
+  ' >/dev/null
+}
+
+other_tab() {
+  tabs | jq -r --arg workspace "$workspace" --arg tab "$current_tab" '
+    [
+      .result.tabs[]?
+      | select(.workspace_id == $workspace and .tab_id != $tab)
+    ]
+    | sort_by(.number)
+    | .[0].tab_id // empty
+  '
+}
+
+focus_tab() {
+  "$herdr_bin" tab focus "$1" >/dev/null
+}
+
+editor="$(editor_tab)"
+
+if [ "$current_tab" = "$editor" ]; then
+  return_tab="$(cat "$state_file" 2>/dev/null || true)"
+
+  if [ -n "$return_tab" ] && tab_exists "$return_tab" && [ "$return_tab" != "$editor" ]; then
+    if focus_tab "$return_tab"; then
+      rm -f "$state_file"
+    fi
+    exit 0
+  fi
+
+  rm -f "$state_file"
+  fallback_tab="$(other_tab)"
+  if [ -n "$fallback_tab" ]; then
+    focus_tab "$fallback_tab"
+  fi
+  exit 0
+fi
+
+printf '%s\n' "$current_tab" >"$state_file"
+
+if [ -n "$editor" ]; then
+  focus_tab "$editor"
+  exit 0
+fi
+
+"$herdr_bin" tab create --workspace "$workspace" --label EDITOR --focus >/dev/null
+editor="$(editor_tab)"
+
+if [ -z "$editor" ]; then
+  printf '%s\n' 'herdr-editor-toggle: could not create EDITOR tab' >&2
+  exit 1
+fi
+
+pane="$("$herdr_bin" pane list --workspace "$workspace" | jq -r --arg tab "$editor" '
+  .result.panes[]?
+  | select(.tab_id == $tab)
+  | .pane_id
+' | sed -n '1p')"
+
+if [ -z "$pane" ]; then
+  printf '%s\n' 'herdr-editor-toggle: could not find EDITOR pane' >&2
+  exit 1
+fi
+
+"$herdr_bin" pane run "$pane" 'nvim; "${HERDR_BIN_PATH:-herdr}" tab close "$HERDR_TAB_ID"' >/dev/null

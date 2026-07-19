@@ -25,6 +25,21 @@ vim.g.loaded_netrwPlugin = 1
 require("lazy").setup({
   "EdenEast/nightfox.nvim",
   "gbprod/substitute.nvim",
+  {
+    "lewis6991/gitsigns.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      signcolumn = true,
+      signs = {
+        add = { text = "▎" },
+        change = { text = "▎" },
+        delete = { text = "▁" },
+        topdelete = { text = "‾" },
+        changedelete = { text = "▎" },
+        untracked = { text = "┆" },
+      },
+    },
+  },
   "monaqa/dial.nvim",
   { "kylechui/nvim-surround", version = "*" },
   { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
@@ -36,30 +51,53 @@ require("lazy").setup({
     keys = {
       {
         "<leader>e",
-        function()
-          local tree_was_focused = vim.bo.filetype == "NvimTree"
-          require("nvim-tree.api").tree.open()
-          if tree_was_focused then vim.cmd("wincmd p") end
-        end,
-        desc = "Open nvim-tree / focus editor",
+        function() require("nvim-tree.api").tree.toggle() end,
+        desc = "Toggle nvim-tree",
       },
-      { "<leader>E", "<Cmd>NvimTreeClose<CR>", desc = "Close nvim-tree" },
     },
     opts = {
-      view = { side = "left", width = 60 },
+      on_attach = function(bufnr)
+        local api = require("nvim-tree.api")
+        api.map.on_attach.default(bufnr)
+        vim.keymap.set("n", "<Esc>", api.tree.close, {
+          buffer = bufnr,
+          desc = "nvim-tree: Close",
+          noremap = true,
+          silent = true,
+        })
+      end,
+      view = {
+        float = {
+          enable = true,
+          quit_on_focus_loss = true,
+          open_win_config = function()
+            local width = math.floor(vim.o.columns * 0.8)
+            local height = math.floor(vim.o.lines * 0.8)
+            return {
+              relative = "editor",
+              border = "rounded",
+              width = width,
+              height = height,
+              row = math.floor((vim.o.lines - height) / 2),
+              col = math.floor((vim.o.columns - width) / 2),
+            }
+          end,
+        },
+      },
       renderer = {
+        add_trailing = true,
         group_empty = true,
         highlight_git = "all",
         icons = {
           git_placement = "right_align",
           glyphs = { git = { unstaged = "○" } },
         },
-        root_folder_label = function(path)
-          local parts = vim.split(vim.fs.normalize(path), "/", { plain = true, trimempty = true })
-          return table.concat(vim.list_slice(parts, math.max(1, #parts - 2)), "/")
-        end,
       },
       git = { enable = true },
+      filters = {
+        git_ignored = true,
+        custom = { "^\\.git$" },
+      },
       diagnostics = { enable = true },
       update_focused_file = { enable = true, update_root = false },
     },
@@ -81,6 +119,11 @@ if not vim.g.vscode then
   vim.opt.completeopt = "menuone"
   vim.opt.termguicolors = true
   vim.cmd("colorscheme duskfox")
+  vim.api.nvim_set_hl(0, "NvimTreeFolderName", { link = "Comment" })
+  vim.api.nvim_set_hl(0, "NvimTreeOpenedFolderName", { link = "Comment" })
+  vim.api.nvim_set_hl(0, "NvimTreeFolderIcon", { link = "Comment" })
+  vim.api.nvim_set_hl(0, "NvimTreeOpenedFolderIcon", { link = "Comment" })
+  vim.api.nvim_set_hl(0, "NvimTreeClosedFolderIcon", { link = "Comment" })
   require("lualine").setup()
   require("cokeline").setup({
     components = {
