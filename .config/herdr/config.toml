@@ -19,9 +19,14 @@ cjk_ime_agents = ["claude", "codex"]
 agent_panel_sort = "spaces"
 
 [[keys.command]]
-key = "prefix+shift+g"
+key = "prefix+g"
 type = "pane"
 command = "lazygit"
+
+[[keys.command]]
+key = "prefix+t"
+type = "pane"
+command = "tuicr"
 
 [[keys.command]]
 key = "prefix+e"

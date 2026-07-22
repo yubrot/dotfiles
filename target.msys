@@ -6,6 +6,7 @@
 .config/mise/config.toml
 .config/nvim/init.lua
 .config/starship.toml
+.config/tuicr/config.toml
 .config/ccstatusline/settings.json
 .local/bin/git-topic
 .local/bin/git-ls-topic
