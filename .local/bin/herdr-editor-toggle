@@ -4,8 +4,8 @@ set -u
 umask 077
 
 herdr_bin="${HERDR_BIN_PATH:-herdr}"
-workspace="${HERDR_ACTIVE_WORKSPACE_ID:-}"
-current_tab="${HERDR_ACTIVE_TAB_ID:-}"
+workspace="${HERDR_WORKSPACE_ID:-${HERDR_ACTIVE_WORKSPACE_ID:-}}"
+current_tab="${HERDR_TAB_ID:-${HERDR_ACTIVE_TAB_ID:-}}"
 
 if [ -z "$workspace" ] || [ -z "$current_tab" ]; then
   printf '%s\n' 'herdr-editor-toggle: run this from a Herdr pane' >&2
